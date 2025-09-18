@@ -1,4 +1,5 @@
 import 'package:app_nghenhac/core/configs/theme/app_theme.dart';
+import 'package:app_nghenhac/presentation/splash/pages/splash.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      home: Container(),
+      home: const SplashPage(),
     );
   }
 }
