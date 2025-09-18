@@ -1,3 +1,4 @@
+import 'package:app_nghenhac/core/configs/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -11,10 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
       home: Container(),
     );
   }
