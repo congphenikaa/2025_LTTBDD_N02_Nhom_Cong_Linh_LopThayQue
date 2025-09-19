@@ -92,24 +92,26 @@ class ChooseModePage extends StatelessWidget {
                         ],
                       ),
                       SizedBox(width: 40,),
-                      ClipOval(
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                          child: Container(
-                            height: 80,
-                            width: 80,
-                            decoration: BoxDecoration(
-                              color: Color.fromRGBO(48, 57, 60, 0.5),
-                              shape: BoxShape.circle,
-                            ),
-                            child: SvgPicture.asset(
-                              AppVectors.sun,
-                              fit: BoxFit.none,
+                      Column(
+                        children: [
+                          ClipOval(
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                              child: Container(
+                                height: 80,
+                                width: 80,
+                                decoration: BoxDecoration(
+                                  color: Color.fromRGBO(48, 57, 60, 0.5),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: SvgPicture.asset(
+                                  AppVectors.sun,
+                                  fit: BoxFit.none,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      SizedBox(height: 15,),
+                          SizedBox(height: 15,),
                           Text(
                             'Light Mode',
                             style: TextStyle(
@@ -118,6 +120,8 @@ class ChooseModePage extends StatelessWidget {
                               color: AppColors.grey,
                             )
                           )
+                        ],
+                      ),
                     ],
                   ),
                   const SizedBox(height: 50,),
