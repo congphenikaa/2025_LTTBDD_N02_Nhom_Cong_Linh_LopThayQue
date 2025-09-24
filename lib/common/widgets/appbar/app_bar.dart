@@ -1,14 +1,19 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:flutter/material.dart';
 
-class BasicAppbar extends StatelessWidget {
-  const BasicAppbar({super.key});
+class BasicAppbar extends StatelessWidget implements PreferredSizeWidget{
+  final Widget ? title;
+  const BasicAppbar({
+    super.key, 
+    this.title});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
+      centerTitle: true,
+      title: title ?? const Text(''),
       leading: IconButton(
         onPressed: () {
           Navigator.pop(context);
@@ -29,4 +34,8 @@ class BasicAppbar extends StatelessWidget {
       ),
     );
   }
+  
+  @override
+  // TODO: implement preferredSize
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
