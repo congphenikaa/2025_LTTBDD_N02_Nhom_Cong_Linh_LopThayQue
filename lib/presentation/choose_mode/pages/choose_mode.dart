@@ -4,6 +4,7 @@ import 'package:app_nghenhac/common/widgets/button/basic_app_button.dart';
 import 'package:app_nghenhac/core/configs/assets/app_images.dart';
 import 'package:app_nghenhac/core/configs/assets/app_vectors.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/presentation/auth/pages/signup_or_singnin.dart';
 import 'package:app_nghenhac/presentation/choose_mode/bloc/theme_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -142,7 +143,7 @@ class ChooseModePage extends StatelessWidget {
                       Navigator.push(
                         context, 
                         MaterialPageRoute(
-                          builder: (BuildContext context) => const ChooseModePage()
+                          builder: (BuildContext context) => const SignupOrSigninPage()
                         )
                       );
                     }, 
