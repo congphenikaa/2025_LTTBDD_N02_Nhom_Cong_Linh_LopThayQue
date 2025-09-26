@@ -4,6 +4,7 @@ import 'package:app_nghenhac/core/configs/assets/app_vectors.dart';
 import 'package:app_nghenhac/data/models/auth/create_user_req.dart';
 import 'package:app_nghenhac/domain/usecases/auth/signup.dart';
 import 'package:app_nghenhac/presentation/auth/pages/signin.dart';
+import 'package:app_nghenhac/presentation/root/pages/root.dart';
 import 'package:app_nghenhac/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -28,7 +29,6 @@ class SignupPage extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        child: Padding(
           padding: const EdgeInsets.symmetric(
             vertical: 50,
             horizontal: 30,
@@ -55,9 +55,16 @@ class SignupPage extends StatelessWidget {
                   );
                   result.fold(
                     (l){
-                      
+                      var snackbar = SnackBar(content: Text(l), behavior: SnackBarBehavior.floating,);
+                      ScaffoldMessenger.of(context).showSnackBar(snackbar);
                     }, 
-                    (r){}
+                    (r){
+                      Navigator.pushAndRemoveUntil(
+                        context, 
+                        MaterialPageRoute(builder: (BuildContext context) => RootPage()), 
+                        (route) => false
+                      );
+                    }
                   );
                 }, 
                 title: 'Create Account'
@@ -65,7 +72,6 @@ class SignupPage extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 
@@ -132,7 +138,7 @@ class SignupPage extends StatelessWidget {
               Navigator.pushReplacement(
                 context, 
                 MaterialPageRoute(
-                 builder: (BuildContext context) => const SigninPage()
+                 builder: (BuildContext context) => SigninPage()
                 )
               );
             }, 
