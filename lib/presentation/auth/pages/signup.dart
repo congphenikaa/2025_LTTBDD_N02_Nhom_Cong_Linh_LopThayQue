@@ -4,7 +4,7 @@ import 'package:app_nghenhac/core/configs/assets/app_vectors.dart';
 import 'package:app_nghenhac/data/models/auth/create_user_req.dart';
 import 'package:app_nghenhac/domain/usecases/auth/signup.dart';
 import 'package:app_nghenhac/presentation/auth/pages/signin.dart';
-import 'package:app_nghenhac/presentation/root/pages/root.dart';
+import 'package:app_nghenhac/presentation/home/pages/home.dart';
 import 'package:app_nghenhac/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -61,7 +61,7 @@ class SignupPage extends StatelessWidget {
                     (r){
                       Navigator.pushAndRemoveUntil(
                         context, 
-                        MaterialPageRoute(builder: (BuildContext context) => RootPage()), 
+                        MaterialPageRoute(builder: (BuildContext context) => HomePage()), 
                         (route) => false
                       );
                     }

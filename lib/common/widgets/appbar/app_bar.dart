@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 
 class BasicAppbar extends StatelessWidget implements PreferredSizeWidget{
   final Widget ? title;
+  final bool hideBack;
   const BasicAppbar({
     super.key, 
+    this.hideBack = false,
     this.title});
 
   @override
@@ -14,7 +16,7 @@ class BasicAppbar extends StatelessWidget implements PreferredSizeWidget{
       elevation: 0,
       centerTitle: true,
       title: title ?? const Text(''),
-      leading: IconButton(
+      leading: hideBack ? null : IconButton(
         onPressed: () {
           Navigator.pop(context);
         }, 
