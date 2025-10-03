@@ -1,6 +1,8 @@
+import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/core/configs/assets/app_images.dart';
 import 'package:app_nghenhac/core/configs/assets/app_vectors.dart';
+import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -75,18 +77,42 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   Widget _tabs() {
     return TabBar(
-      tabs: [
+      controller: _tabController,
+      isScrollable: true,
+      labelColor: context.isDarkMode ? Colors.white : Colors.black,
+      indicatorColor: AppColors.primary,
+      padding: const EdgeInsets.symmetric(
+        vertical: 40,
+        horizontal: 16
+      ),
+      tabs: const [
         Text(
-          'News'
+          'News',
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 16
+          ),
         ),
         Text(
-          'Videos'
+          'Videos',
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 16
+          ),
         ),
         Text(
-          'Artists'
+          'Artists',
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 16
+          ),
         ),
         Text(
-          'Podcasts'
+          'Podcasts',
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 16
+          ),
         ),
       ],
     );
