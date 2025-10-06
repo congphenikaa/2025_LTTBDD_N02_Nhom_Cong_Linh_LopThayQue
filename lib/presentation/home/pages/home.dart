@@ -3,6 +3,7 @@ import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/core/configs/assets/app_images.dart';
 import 'package:app_nghenhac/core/configs/assets/app_vectors.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/presentation/home/widgets/news_songs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -40,6 +41,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           children: [
             _homeTopCard(),
             _tabs(),
+            SizedBox(
+              height: 260,
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  const NewsSongs(),
+                  Container(),
+                  Container(),
+                  Container(),
+                ],
+                
+              ),
+            )
           ],
         ),
       ),
@@ -76,45 +90,31 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Widget _tabs() {
-    return TabBar(
-      controller: _tabController,
-      isScrollable: true,
-      labelColor: context.isDarkMode ? Colors.white : Colors.black,
-      indicatorColor: AppColors.primary,
-      padding: const EdgeInsets.symmetric(
-        vertical: 40,
-        horizontal: 16
-      ),
-      tabs: const [
-        Text(
-          'News',
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 16
-          ),
-        ),
-        Text(
-          'Videos',
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 16
-          ),
-        ),
-        Text(
-          'Artists',
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 16
-          ),
-        ),
-        Text(
-          'Podcasts',
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 16
-          ),
-        ),
-      ],
-    );
-  }
+  return TabBar(
+    controller: _tabController,
+    labelColor: context.isDarkMode ? Colors.white : Colors.black,
+    unselectedLabelColor: context.isDarkMode ? Colors.white60 : Colors.black54,
+    indicatorColor: AppColors.primary,
+    indicatorWeight: 2,
+    dividerColor: Colors.transparent,
+    labelStyle: const TextStyle(
+      fontWeight: FontWeight.w500,
+      fontSize: 14
+    ),
+    unselectedLabelStyle: const TextStyle(
+      fontWeight: FontWeight.w400,
+      fontSize: 14
+    ),
+    padding: const EdgeInsets.symmetric(
+      vertical: 40,
+      horizontal: 16
+    ),
+    tabs: const [
+      Tab(text: 'News'),
+      Tab(text: 'Videos'),
+      Tab(text: 'Artists'),
+      Tab(text: 'Podcasts'),
+    ],
+  );
+}
 }
