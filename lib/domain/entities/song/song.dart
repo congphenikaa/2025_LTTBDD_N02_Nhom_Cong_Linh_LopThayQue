@@ -12,4 +12,7 @@ class SongEntity {
     required this.duration, 
     required this.releaseDate
   });
+
+  
 }
+

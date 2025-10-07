@@ -90,31 +90,34 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Widget _tabs() {
-  return TabBar(
-    controller: _tabController,
-    labelColor: context.isDarkMode ? Colors.white : Colors.black,
-    unselectedLabelColor: context.isDarkMode ? Colors.white60 : Colors.black54,
-    indicatorColor: AppColors.primary,
-    indicatorWeight: 2,
-    dividerColor: Colors.transparent,
-    labelStyle: const TextStyle(
-      fontWeight: FontWeight.w500,
-      fontSize: 14
-    ),
-    unselectedLabelStyle: const TextStyle(
-      fontWeight: FontWeight.w400,
-      fontSize: 14
-    ),
-    padding: const EdgeInsets.symmetric(
-      vertical: 40,
-      horizontal: 16
-    ),
-    tabs: const [
-      Tab(text: 'News'),
-      Tab(text: 'Videos'),
-      Tab(text: 'Artists'),
-      Tab(text: 'Podcasts'),
-    ],
-  );
-}
+    return TabBar(
+      controller: _tabController,
+      isScrollable: true,
+      labelColor: context.isDarkMode ? Colors.white : Colors.black,
+      unselectedLabelColor: context.isDarkMode ? Colors.white60 : Colors.black54,
+      indicatorColor: AppColors.primary,
+      indicatorWeight: 2,
+      dividerColor: Colors.transparent,
+      labelStyle: const TextStyle(
+        fontWeight: FontWeight.w500,
+        fontSize: 14
+      ),
+      unselectedLabelStyle: const TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: 14
+      ),
+      padding: const EdgeInsets.symmetric(
+        vertical: 40,
+        horizontal: 16
+      ),
+      tabAlignment: TabAlignment.start,
+      indicatorSize: TabBarIndicatorSize.label,
+      tabs: const [
+        Tab(text: 'News'),
+        Tab(text: 'Videos'),
+        Tab(text: 'Artists'),
+        Tab(text: 'Podcasts'),
+      ],
+    );
+  }
 }

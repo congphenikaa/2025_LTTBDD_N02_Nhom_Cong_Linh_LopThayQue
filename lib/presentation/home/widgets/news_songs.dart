@@ -51,7 +51,7 @@ class NewsSongs extends StatelessWidget {
                     image: DecorationImage(
                       fit: BoxFit.cover,
                       image: NetworkImage(
-                        AppURLs.firestorage + songs[index].artist + ' - ' + songs[index].title + '.jpg?' + AppURLs.mediaAlt
+                        AppURLs.firestorage + songs[index].artist + ' - ' + songs[index].title + '.jpg?'+ AppURLs.mediaAlt
                       )
                     )
                   ),
@@ -65,4 +65,6 @@ class NewsSongs extends StatelessWidget {
       itemCount: songs.length
     );
   }
+
+  
 }
