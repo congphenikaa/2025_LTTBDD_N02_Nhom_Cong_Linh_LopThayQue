@@ -9,8 +9,10 @@ import 'package:app_nghenhac/domain/usecases/auth/signup.dart';
 import 'package:app_nghenhac/domain/usecases/song/get_news_songs.dart';
 import 'package:get_it/get_it.dart';
 
+
 final sl = GetIt.instance;
-Future<void> initilizeDependencies() async {
+
+Future<void> initializeDependencies() async { 
 
   sl.registerSingleton<AuthFirebaseService>(
     AuthFirebaseServiceImpl()
@@ -28,6 +30,10 @@ Future<void> initilizeDependencies() async {
     SongRepositoryImpl()
   );
 
+  sl.registerSingleton<SongRepositoryImpl>(  // Thêm dòng này
+    SongRepositoryImpl()
+  );
+
   sl.registerSingleton<SignupUseCase>(
     SignupUseCase()
   );
@@ -40,6 +46,4 @@ Future<void> initilizeDependencies() async {
     GetNewsSongsUseCase()
   );
 
-
-  
 }

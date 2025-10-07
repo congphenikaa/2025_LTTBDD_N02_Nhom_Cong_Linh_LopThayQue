@@ -1,3 +1,4 @@
+import 'package:app_nghenhac/core/constants/app_urls.dart';
 import 'package:app_nghenhac/domain/entities/song/song.dart';
 import 'package:app_nghenhac/presentation/home/bloc/news_songs_cubit.dart';
 import 'package:app_nghenhac/presentation/home/bloc/news_songs_state.dart';
@@ -10,7 +11,7 @@ class NewsSongs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => NewsSongsCubit(),
+      create: (_) => NewsSongsCubit()..getNewsSongs(),
       child: SizedBox(
         height: 200,
         child: BlocBuilder<NewsSongsCubit, NewsSongsState>(
@@ -40,10 +41,24 @@ class NewsSongs extends StatelessWidget {
     return ListView.separated(
       scrollDirection: Axis.horizontal,
       itemBuilder: (context, index){
-        return Column(
-          children: [
-
-          ],
+        return SizedBox(
+          width: 160,
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage(
+                        AppURLs.firestorage + songs[index].artist + ' - ' + songs[index].title + '.jpg?' + AppURLs.mediaAlt
+                      )
+                    )
+                  ),
+                ),
+              )
+            ],
+          ),
         );
       },
       separatorBuilder: (context, index) => SizedBox(width: 14,), 
