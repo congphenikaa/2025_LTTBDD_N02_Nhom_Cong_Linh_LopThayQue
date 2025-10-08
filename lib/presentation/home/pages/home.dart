@@ -4,6 +4,7 @@ import 'package:app_nghenhac/core/configs/assets/app_images.dart';
 import 'package:app_nghenhac/core/configs/assets/app_vectors.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
 import 'package:app_nghenhac/presentation/home/widgets/news_songs.dart';
+import 'package:app_nghenhac/presentation/home/widgets/play_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -51,9 +52,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   Container(),
                   Container(),
                 ],
-                
               ),
-            )
+            ),
+            const PlayList()
           ],
         ),
       ),
@@ -90,34 +91,49 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Widget _tabs() {
-    return TabBar(
-      controller: _tabController,
-      isScrollable: true,
-      labelColor: context.isDarkMode ? Colors.white : Colors.black,
-      unselectedLabelColor: context.isDarkMode ? Colors.white60 : Colors.black54,
-      indicatorColor: AppColors.primary,
-      indicatorWeight: 2,
-      dividerColor: Colors.transparent,
-      labelStyle: const TextStyle(
-        fontWeight: FontWeight.w500,
-        fontSize: 14
+  return Container(
+    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+    child: AnimatedBuilder(
+      animation: _tabController,
+      builder: (context, child) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildTabButton('News', 0),
+            _buildTabButton('Videos', 1),
+            _buildTabButton('Artists', 2),
+            _buildTabButton('Podcasts', 3),
+          ],
+        );
+      },
+    ),
+  );
+}
+
+Widget _buildTabButton(String text, int index) {
+  final isSelected = _tabController.index == index;
+  return GestureDetector(
+    onTap: () {
+      _tabController.animateTo(index);
+    },
+    child: Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      decoration: BoxDecoration(
+        border: isSelected 
+          ? Border(bottom: BorderSide(color: AppColors.primary, width: 2))
+          : null,
       ),
-      unselectedLabelStyle: const TextStyle(
-        fontWeight: FontWeight.w400,
-        fontSize: 14
+      child: Text(
+        text,
+        style: TextStyle(
+          fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+          fontSize: 14,
+          color: isSelected 
+            ? (context.isDarkMode ? Colors.white : Colors.black)
+            : (context.isDarkMode ? Colors.white60 : Colors.black54),
+        ),
       ),
-      padding: const EdgeInsets.symmetric(
-        vertical: 40,
-        horizontal: 16
-      ),
-      tabAlignment: TabAlignment.start,
-      indicatorSize: TabBarIndicatorSize.label,
-      tabs: const [
-        Tab(text: 'News'),
-        Tab(text: 'Videos'),
-        Tab(text: 'Artists'),
-        Tab(text: 'Podcasts'),
-      ],
-    );
-  }
+    ),
+  );
+}
 }

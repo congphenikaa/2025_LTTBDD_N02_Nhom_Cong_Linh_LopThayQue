@@ -7,6 +7,7 @@ import 'package:app_nghenhac/domain/repository/song/song.dart';
 import 'package:app_nghenhac/domain/usecases/auth/signin.dart';
 import 'package:app_nghenhac/domain/usecases/auth/signup.dart';
 import 'package:app_nghenhac/domain/usecases/song/get_news_songs.dart';
+import 'package:app_nghenhac/domain/usecases/song/get_play_list.dart';
 import 'package:get_it/get_it.dart';
 
 
@@ -30,7 +31,7 @@ Future<void> initializeDependencies() async {
     SongRepositoryImpl()
   );
 
-  sl.registerSingleton<SongRepositoryImpl>(  // Thêm dòng này
+  sl.registerSingleton<SongRepositoryImpl>(  
     SongRepositoryImpl()
   );
 
@@ -44,6 +45,10 @@ Future<void> initializeDependencies() async {
 
   sl.registerSingleton<GetNewsSongsUseCase>(
     GetNewsSongsUseCase()
+  );
+
+  sl.registerSingleton<GetPlayListUseCase>(
+    GetPlayListUseCase()
   );
 
 }
