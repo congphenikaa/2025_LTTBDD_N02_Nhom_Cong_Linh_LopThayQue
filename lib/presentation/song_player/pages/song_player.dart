@@ -1,4 +1,5 @@
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
+import 'package:app_nghenhac/common/widgets/favorite_button/favorite_button.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
 import 'package:app_nghenhac/core/constants/app_urls.dart';
 import 'package:app_nghenhac/domain/entities/song/song.dart';
@@ -94,13 +95,8 @@ class SongPlayerPages extends StatelessWidget {
             )
           ],
         ),
-        IconButton(
-          onPressed: () {}, 
-          icon: Icon(
-            Icons.favorite_outline_rounded,
-            size: 35,
-            color: AppColors.darkGrey,
-          )
+        FavoriteButton(
+          songEntity: songEntity,
         )
       ],
     );

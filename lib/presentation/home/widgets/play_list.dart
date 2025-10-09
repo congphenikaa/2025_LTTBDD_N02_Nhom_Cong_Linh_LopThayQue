@@ -1,4 +1,5 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
+import 'package:app_nghenhac/common/widgets/favorite_button/favorite_button.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
 import 'package:app_nghenhac/domain/entities/song/song.dart';
 import 'package:app_nghenhac/presentation/home/bloc/play_list_cubit.dart';
@@ -124,13 +125,8 @@ class PlayList extends StatelessWidget {
                     songs[index].duration.toString().replaceAll('.', ':')
                   ),
                   const SizedBox(width: 20,),
-                  IconButton(
-                    onPressed: () {}, 
-                    icon: Icon(
-                      Icons.favorite_outline_rounded,
-                      size: 25,
-                      color: AppColors.darkGrey,
-                    )
+                  FavoriteButton(
+                    songEntity: songs[index],
                   )
                 ],
               )
