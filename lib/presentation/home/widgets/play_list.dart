@@ -72,7 +72,10 @@ class PlayList extends StatelessWidget {
           onTap: () {
             Navigator.push(
               context, 
-              MaterialPageRoute(builder: (BuildContext context) => SongPlayerPages())
+              MaterialPageRoute(builder: (BuildContext context) 
+                => SongPlayerPages(songEntity: songs[index],
+                )
+              )
             );
           },
           child: Row(
@@ -124,7 +127,8 @@ class PlayList extends StatelessWidget {
                   IconButton(
                     onPressed: () {}, 
                     icon: Icon(
-                      Icons.favorite_rounded,
+                      Icons.favorite_outline_rounded,
+                      size: 25,
                       color: AppColors.darkGrey,
                     )
                   )
