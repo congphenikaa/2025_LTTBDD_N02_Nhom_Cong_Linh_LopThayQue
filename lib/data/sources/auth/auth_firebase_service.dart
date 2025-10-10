@@ -1,5 +1,9 @@
+import 'package:app_nghenhac/core/configs/assets/app_images.dart';
+import 'package:app_nghenhac/core/constants/app_urls.dart';
 import 'package:app_nghenhac/data/models/auth/create_user_req.dart';
 import 'package:app_nghenhac/data/models/auth/signin_user_req.dart';
+import 'package:app_nghenhac/data/models/auth/user.dart';
+import 'package:app_nghenhac/domain/entities/auth/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,6 +13,9 @@ abstract class AuthFirebaseService {
   Future<Either> signup(CreateUserReq createUserReq);
   
   Future<Either> signin(SigninUserReq signinUserReq);
+
+  Future<Either> getUser();
+
 }
 
 class AuthFirebaseServiceImpl extends AuthFirebaseService {
@@ -68,6 +75,26 @@ class AuthFirebaseServiceImpl extends AuthFirebaseService {
       }
 
       return Left(message);
+    }
+  }
+  
+  @override
+  Future<Either> getUser() async {
+    try {
+      FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+      FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+
+      var user = await firebaseFirestore.collection('Users').doc(
+        firebaseAuth.currentUser?.uid
+      ).get();
+
+      UserModel userModel = UserModel.fromJson(user.data()!);
+      userModel.imageURl = firebaseAuth.currentUser?.photoURL ?? AppURLs.user;
+
+      UserEntity userEntity = userModel.toEntity();
+      return Right(userEntity);
+    } catch (e) {
+      return Left('An error occured');
     }
   }
 

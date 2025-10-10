@@ -8,4 +8,5 @@ class AppImages {
   static const String homeArtist = '${basePath}home_artist.png';
 
 
+
 }
