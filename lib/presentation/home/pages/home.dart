@@ -31,6 +31,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return Scaffold(
       appBar: BasicAppbar(
         hideBack: true,
+        leading: IconButton(
+          onPressed: () {
+            // TODO: Implement search functionality
+          }, 
+          icon: const Icon(
+            Icons.search
+          )
+        ),
+        title: SvgPicture.asset(
+          AppVectors.logo,
+          height: 40,
+          width: 40,
+        ),
         action: IconButton(
           onPressed: () {
             Navigator.push(
@@ -41,11 +54,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           icon: const Icon(
             Icons.person
           )
-        ),
-        title: SvgPicture.asset(
-          AppVectors.logo,
-          height: 40,
-          width: 40,
         ),
       ),
       body: SingleChildScrollView(

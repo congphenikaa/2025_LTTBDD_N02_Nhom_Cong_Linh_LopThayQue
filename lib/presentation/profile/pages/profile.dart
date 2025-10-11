@@ -6,6 +6,7 @@ import 'package:app_nghenhac/presentation/profile/bloc/favorite_songs_cubit.dart
 import 'package:app_nghenhac/presentation/profile/bloc/favorite_songs_state.dart';
 import 'package:app_nghenhac/presentation/profile/bloc/profile_info_cubit.dart';
 import 'package:app_nghenhac/presentation/profile/bloc/profile_info_state.dart';
+import 'package:app_nghenhac/presentation/song_player/pages/song_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -121,61 +122,72 @@ class ProfilePage extends StatelessWidget {
                       return ListView.separated(
                         shrinkWrap: true,
                         itemBuilder: (context, index){
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    height: 70,
-                                    width: 70,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                          '${AppURLs.coverFirestorage}${state.favoriteSongs[index].artist} - ${state.favoriteSongs[index].title}.jpg?${AppURLs.mediaAlt}'
+                          return GestureDetector(
+                            onTap: (){
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) => SongPlayerPages(songEntity: state.favoriteSongs[index])
+                                )
+                              );
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      height: 70,
+                                      width: 70,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        image: DecorationImage(
+                                          image: NetworkImage(
+                                            '${AppURLs.coverFirestorage}${state.favoriteSongs[index].artist} - ${state.favoriteSongs[index].title}.jpg?${AppURLs.mediaAlt}'
+                                          )
                                         )
-                                      )
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10,),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        state.favoriteSongs[index].title,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
                                       ),
-                                      SizedBox(height: 5,),
-                                      Text(
-                                        state.favoriteSongs[index].artist,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 11
+                                    ),
+                                    const SizedBox(width: 10,),
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          state.favoriteSongs[index].title,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
                                         ),
-                                      )
-                                    ],
-                                  )
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    state.favoriteSongs[index].duration.toString().replaceAll('.', ':')
-                                  ),
-                                  const SizedBox(width: 20,),
-                                  FavoriteButton(
-                                    songEntity: state.favoriteSongs[index],
-                                    function: () {
-                                      context.read<FavoriteSongsCubit>().removeSong(index);
-                                    },
-                                  )
-                                ],
-                              )
-                            ],
+                                        SizedBox(height: 5,),
+                                        Text(
+                                          state.favoriteSongs[index].artist,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 11
+                                          ),
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      state.favoriteSongs[index].duration.toString().replaceAll('.', ':')
+                                    ),
+                                    const SizedBox(width: 20,),
+                                    FavoriteButton(
+                                      songEntity: state.favoriteSongs[index],
+                                      key: UniqueKey(),
+                                      function: () {
+                                        context.read<FavoriteSongsCubit>().removeSong(index);
+                                      },
+                                    )
+                                  ],
+                                )
+                              ],
+                            ),
                           );
                         }, 
                         separatorBuilder: (context, index) => SizedBox(height: 20,), 

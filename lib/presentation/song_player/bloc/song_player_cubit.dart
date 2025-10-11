@@ -29,7 +29,7 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
       }
     });
 
-    // Lắng nghe trạng thái loading
+    
     audioPlayer.playerStateStream.listen((playerState) {
       if (!_isDisposed) {
         if (playerState.processingState == ProcessingState.loading) {
