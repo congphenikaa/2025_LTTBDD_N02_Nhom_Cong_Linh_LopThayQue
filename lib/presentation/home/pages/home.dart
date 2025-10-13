@@ -1,5 +1,6 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
+import 'package:app_nghenhac/common/widgets/bottombar/bottom_bar.dart';
 import 'package:app_nghenhac/core/configs/assets/app_images.dart';
 import 'package:app_nghenhac/core/configs/assets/app_vectors.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
@@ -18,6 +19,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  int _selectedBottomBarIndex = 0;
 
   @override
   void initState() {
@@ -25,6 +27,39 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     _tabController = TabController(length: 4, vsync: this);
   }
 
+  void _onBottomBarItemTapped(int index) {
+    setState(() {
+      _selectedBottomBarIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+        // Đã ở Home, không cần làm gì
+        break;
+      case 1:
+        // TODO: Navigate to Search page
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
+        break;
+      case 2:
+        // TODO: Navigate to Library page
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => LibraryPage()));
+        break;
+      case 3:
+        Navigator.push(
+          context, 
+          MaterialPageRoute(builder: (context) => const ProfilePage())
+        ).then((_) {
+          // Reset selected index khi quay về
+          setState(() {
+            _selectedBottomBarIndex = 0;
+          });
+        });
+        break;
+    }
+  }
+  
+
+  
   
   @override
   Widget build(BuildContext context) {
@@ -77,6 +112,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             const PlayList()
           ],
         ),
+      ),
+      bottomNavigationBar: AnimatedBottomBar(
+        selectedIndex: _selectedBottomBarIndex,
+        onItemTapped: _onBottomBarItemTapped,
       ),
     );
   }
