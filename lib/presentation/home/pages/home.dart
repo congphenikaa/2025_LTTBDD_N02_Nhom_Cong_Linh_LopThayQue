@@ -80,14 +80,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           width: 40,
         ),
         action: IconButton(
-          onPressed: () {
-            Navigator.push(
-              context, 
-              MaterialPageRoute(builder: (BuildContext context) => const ProfilePage())
-            );
+          onPressed: (){
+            
           }, 
           icon: const Icon(
-            Icons.person
+            Icons.more_vert_outlined
           )
         ),
       ),
