@@ -44,6 +44,10 @@ dependencies:
   dartz: 
   cloud_firestore: 
   just_audio: 
+  equatable: 
+  dio: 
+  shared_preferences: 
+  firebase_storage: 
   
 
 dev_dependencies:

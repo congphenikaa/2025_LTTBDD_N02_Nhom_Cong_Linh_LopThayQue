@@ -7,7 +7,11 @@ import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
 import 'package:app_nghenhac/presentation/home/widgets/news_songs.dart';
 import 'package:app_nghenhac/presentation/home/widgets/play_list.dart';
 import 'package:app_nghenhac/presentation/profile/pages/profile.dart';
+import 'package:app_nghenhac/presentation/search/bloc/search_cubit.dart';
+import 'package:app_nghenhac/presentation/search/pages/search_page.dart';
+import 'package:app_nghenhac/service_locator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class HomePage extends StatefulWidget {
@@ -37,8 +41,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         // Đã ở Home, không cần làm gì
         break;
       case 1:
-        // TODO: Navigate to Search page
-        // Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BlocProvider(
+              create: (_) => sl<SearchCubit>(),
+              child: const SearchPage(),
+            ),
+          ),
+        ).then((_) {
+          setState(() {
+            _selectedBottomBarIndex = 0;
+          });
+        });
         break;
       case 2:
         // TODO: Navigate to Library page
@@ -68,7 +83,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         hideBack: true,
         leading: IconButton(
           onPressed: () {
-            // TODO: Implement search functionality
+            Navigator.push(
+            context, 
+            MaterialPageRoute(builder: (context) => const SearchPage())
+          );
           }, 
           icon: const Icon(
             Icons.search
@@ -81,7 +99,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         ),
         action: IconButton(
           onPressed: (){
-            
+
           }, 
           icon: const Icon(
             Icons.more_vert_outlined
