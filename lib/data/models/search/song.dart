@@ -85,7 +85,9 @@ class SongModel extends Equatable {
   static int? _parseDuration(dynamic duration) {
     if (duration == null) return null;
     if (duration is int) return duration;
+    if (duration is String) return int.tryParse(duration);
     if (duration is double) return duration.round();
+    print('⚠️ Unknown duration type: ${duration.runtimeType}');
     return null;
   }
 

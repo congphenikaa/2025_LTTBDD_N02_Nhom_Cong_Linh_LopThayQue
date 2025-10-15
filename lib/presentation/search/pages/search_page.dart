@@ -2,6 +2,10 @@ import 'package:app_nghenhac/common/widgets/search/album_card.dart';
 import 'package:app_nghenhac/common/widgets/search/artist_card.dart';
 import 'package:app_nghenhac/common/widgets/search/play_list_card.dart';
 import 'package:app_nghenhac/common/widgets/search/song_list_title.dart';
+import 'package:app_nghenhac/domain/entities/search/album.dart';
+import 'package:app_nghenhac/domain/entities/search/artist.dart';
+import 'package:app_nghenhac/domain/entities/search/playlist.dart';
+import 'package:app_nghenhac/domain/entities/search/song.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
@@ -21,12 +25,17 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
+  late SearchCubit _searchCubit;
 
   @override
   void initState() {
     super.initState();
+    _searchCubit = sl<SearchCubit>();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _searchFocusNode.requestFocus();
+      // Load search history when page opens
+      _searchCubit.loadSearchHistory();
+
     });
   }
 
@@ -34,97 +43,135 @@ class _SearchPageState extends State<SearchPage> {
   void dispose() {
     _searchController.dispose();
     _searchFocusNode.dispose();
+    _searchCubit.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => sl<SearchCubit>(),
+    print('🎯 SearchPage build called'); // DEBUG
+    
+    return BlocProvider<SearchCubit>.value(
+      value: _searchCubit,
       child: Scaffold(
         appBar: BasicAppbar(
           title: const Text('Search'),
         ),
-        body: Column(
-          children: [
-            _buildSearchField(),
-            Expanded(
-              child: BlocBuilder<SearchCubit, SearchState>(
+        body: SafeArea(
+          child: Column(
+            children: [
+              _buildSearchField(),
+              Expanded(
+                child: BlocBuilder<SearchCubit, SearchState>(
+                bloc: _searchCubit,
                 builder: (context, state) {
-                  if (state is SearchInitial) {
-                    return _buildInitialView();
-                  } else if (state is SearchLoading) {
-                    return _buildLoadingView();
-                  } else if (state is SearchSuccess) {
+                  print('🎯 BlocBuilder received state: ${state.runtimeType}');
+                  
+                  if (state is SearchSuccess) {
+                    print('🎯 SearchSuccess in UI:');
+                    print('   Songs: ${state.songs.length}');
+                    print('   Artists: ${state.artists.length}');
+                    print('   Albums: ${state.albums.length}');
+                    print('   Playlists: ${state.playlists.length}');
+                    
+                    // ✅ Gọi method hiển thị widgets thật
                     return _buildSearchResults(state);
-                  } else if (state is SearchFailure) {
-                    return _buildErrorView(state.message);
-                  } else if (state is SearchEmpty) {
-                    return _buildEmptyView();
-                  } else if (state is SearchHistoryLoaded) {
-                    return _buildHistoryView(state.history);
                   }
-                  return Container();
+                  
+                  if (state is SearchLoading) {
+                    print('🎯 SearchLoading in UI');
+                    return _buildLoadingView();
+                  }
+                  
+                  if (state is SearchInitial || state is SearchHistoryLoaded) {
+                    print('🎯 SearchInitial/HistoryLoaded in UI');
+                    return _buildInitialView();
+                  }
+                  
+                  if (state is SearchEmpty) {
+                    print('🎯 SearchEmpty in UI');
+                    return _buildEmptyView();
+                  }
+                  
+                  if (state is SearchFailure) {
+                    print('🎯 SearchFailure in UI: ${state.message}');
+                    return _buildErrorView(state.message);
+                  }
+                  
+                  return _buildInitialView(); // Default view
                 },
               ),
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildSearchField() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: TextField(
-        controller: _searchController,
-        focusNode: _searchFocusNode,
-        decoration: InputDecoration(
-          hintText: 'What do you want to listen to?',
-          prefixIcon: const Icon(Icons.search),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    _searchController.clear();
-                    context.read<SearchCubit>().clearSearch();
-                    setState(() {});
-                  },
-                )
-              : null,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(25),
-            borderSide: BorderSide.none,
-          ),
-          filled: true,
-          fillColor: context.isDarkMode ? Colors.grey[800] : Colors.grey[200],
+  return Container(
+    padding: const EdgeInsets.all(16),
+    child: TextField(
+      controller: _searchController,
+      focusNode: _searchFocusNode,
+      decoration: InputDecoration(
+        hintText: 'What do you want to listen to?',
+        prefixIcon: const Icon(Icons.search),
+        suffixIcon: _searchController.text.isNotEmpty
+            ? IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: () {
+                  _searchController.clear();
+                  _searchCubit.clearSearch();
+                  _searchCubit.loadSearchHistory(); // Reload history
+                  setState(() {});
+                },
+              )
+            : null,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(25),
+          borderSide: BorderSide.none,
         ),
-        onChanged: (value) {
-          setState(() {}); // update suffixIcon
-          final cubit = context.read<SearchCubit>(); // capture ngay
-          if (value.trim().isNotEmpty) {
-            Future.delayed(const Duration(milliseconds: 500), () {
-              if (!mounted) return;
-              if (_searchController.text == value) {
-                cubit.search(value);
-              }
-            });
-          } else {
-            cubit.clearSearch();
-          }
-        },
+        filled: true,
+        fillColor: context.isDarkMode ? Colors.grey[800] : Colors.grey[200],
       ),
-    );
-  }
+      onSubmitted: (value) {
+        if (value.trim().isNotEmpty) {
+            print('🔍 Search submitted: "$value"');
+            _searchCubit.saveSearchQuery(value.trim());
+            _searchCubit.search(value.trim());
+          }
+      },
+      onChanged: (value) {
+      setState(() {}); // update suffixIcon
+      
+      if (value.trim().isNotEmpty) {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (!mounted) return;
+          if (_searchController.text == value) {
+            _searchCubit.search(value); // ✅ Dùng CÙNG instance
+            _searchCubit.saveSearchQuery(value.trim()); // ✅ Dùng CÙNG instance
+          }
+        });
+      } else {
+        _searchCubit.clearSearch(); // ✅ Dùng CÙNG instance
+        _searchCubit.loadSearchHistory(); // ✅ Dùng CÙNG instance
+      }
+    },
+    ),
+  );
+}
 
   Widget _buildInitialView() {
-    return Column(
-      children: [
-        _buildBrowseCategories(),
-        const SizedBox(height: 20),
-        _buildRecentSearches(),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildBrowseCategories(),
+          const SizedBox(height: 20),
+          _buildRecentSearches(),
+        ],
+      ),
     );
   }
 
@@ -169,7 +216,7 @@ class _SearchPageState extends State<SearchPage> {
             return InkWell(
               onTap: () {
                 _searchController.text = category['title'] as String;
-                context.read<SearchCubit>().search(category['title'] as String);
+                _searchCubit.search(category['title'] as String); // ✅ Dùng _searchCubit
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -197,13 +244,12 @@ class _SearchPageState extends State<SearchPage> {
   Widget _buildRecentSearches() {
     return BlocBuilder<SearchCubit, SearchState>(
       builder: (context, state) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
+        if (state is SearchHistoryLoaded) {
+          if (state.history.isEmpty) {
+            return Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Recent searches',
@@ -213,25 +259,76 @@ class _SearchPageState extends State<SearchPage> {
                       color: context.isDarkMode ? Colors.white : Colors.black,
                     ),
                   ),
-                  TextButton(
-                    onPressed: () {
-                      context.read<SearchCubit>().clearSearchHistory();
-                    },
-                    child: const Text('Clear all'),
+                  const SizedBox(height: 12),
+                  const Center(
+                    child: Text(
+                      'No recent searches',
+                      style: TextStyle(color: Colors.grey),
+                    ),
                   ),
                 ],
               ),
+            );
+          }
+
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Recent searches',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: context.isDarkMode ? Colors.white : Colors.black,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                         _searchCubit.clearSearchHistory();
+                      },
+                      child: const Text('Clear all'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // Show history items with individual delete buttons
+                ...state.history.map((query) => _buildHistoryItem(query)).toList(),
+              ],
             ),
-            const SizedBox(height: 12),
-            // Load search history when widget builds
-            FutureBuilder(
-              future: context.read<SearchCubit>().getSearchHistory(),
-              builder: (context, snapshot) {
-                return Container(); // History will be shown via BlocBuilder
-              },
-            ),
-          ],
-        );
+          );
+        }
+
+        // If not SearchHistoryLoaded state, return empty container
+        return Container();
+      },
+    );
+  }
+
+  Widget _buildHistoryItem(String query) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 0),
+      leading: const Icon(Icons.history, color: Colors.grey),
+      title: Text(
+        query,
+        style: TextStyle(
+          color: context.isDarkMode ? Colors.white : Colors.black,
+        ),
+      ),
+      trailing: IconButton(
+        icon: const Icon(Icons.close, color: Colors.grey, size: 20),
+        onPressed: () {
+          // Remove individual item
+          _searchCubit.removeSearchHistoryItem(query);
+        },
+      ),
+      onTap: () {
+        _searchController.text = query;
+        _searchCubit.search(query); // ✅ Dùng _searchCubit thay vì context.read
       },
     );
   }
@@ -270,28 +367,44 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   Widget _buildSearchResults(SearchSuccess state) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (state.songs.isNotEmpty) _buildSongsSection(state.songs),
-          if (state.artists.isNotEmpty) _buildArtistsSection(state.artists),
-          if (state.albums.isNotEmpty) _buildAlbumsSection(state.albums),
-          if (state.playlists.isNotEmpty) _buildPlaylistsSection(state.playlists),
-          if (state.songs.isEmpty && 
-              state.artists.isEmpty && 
-              state.albums.isEmpty && 
-              state.playlists.isEmpty)
-            _buildNoResultsView(),
-        ],
-      ),
+    return CustomScrollView(
+      slivers: [
+        // ✅ Sử dụng CustomScrollView để layout linh hoạt
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          sliver: SliverList(
+            delegate: SliverChildListDelegate([
+              const SizedBox(height: 8),
+              
+              if (state.songs.isNotEmpty) 
+                _buildSongsSection(state.songs),
+              
+              if (state.albums.isNotEmpty) 
+                _buildAlbumsSection(state.albums),
+              
+              if (state.artists.isNotEmpty) 
+                _buildArtistsSection(state.artists),
+              
+              if (state.playlists.isNotEmpty) 
+                _buildPlaylistsSection(state.playlists),
+              
+              if (state.songs.isEmpty && 
+                  state.artists.isEmpty && 
+                  state.albums.isEmpty && 
+                  state.playlists.isEmpty) 
+                _buildNoResultsView(),
+              
+              const SizedBox(height: 100), // Safe area bottom
+            ]),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildSongsSection(List<dynamic> songs) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildSongsSection(List<SongEntity> songs) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Songs',
@@ -307,9 +420,12 @@ class _SearchPageState extends State<SearchPage> {
           physics: const NeverScrollableScrollPhysics(),
           itemCount: songs.length,
           itemBuilder: (context, index) {
-            final song = songs[index]; // This is SongEntity from Firebase
-            return SongListTitle( // Sử dụng widget hiện có
-              song: song,     // Đúng parameter name
+            final song = songs[index];
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: SongListTitle(
+                song: song,
+              ),
             );
           },
         ),
@@ -318,7 +434,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildArtistsSection(List<dynamic> artists) {
+  Widget _buildArtistsSection(List<ArtistEntity> artists) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -337,9 +453,12 @@ class _SearchPageState extends State<SearchPage> {
             scrollDirection: Axis.horizontal,
             itemCount: artists.length,
             itemBuilder: (context, index) {
-              final artist = artists[index]; // This is ArtistEntity
-              return ArtistCard(
-                artist: artist, // Đúng parameter name
+              final artist = artists[index];
+              return Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: ArtistCard(
+                  artist: artist,
+                ),
               );
             },
           ),
@@ -349,7 +468,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildAlbumsSection(List<dynamic> albums) {
+  Widget _buildAlbumsSection(List<AlbumEntity> albums) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -368,9 +487,12 @@ class _SearchPageState extends State<SearchPage> {
             scrollDirection: Axis.horizontal,
             itemCount: albums.length,
             itemBuilder: (context, index) {
-              final album = albums[index]; // This is AlbumEntity
-              return AlbumCard(
-                album: album, // Đúng parameter name
+              final album = albums[index];
+              return Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: AlbumCard(
+                  album: album,
+                ),
               );
             },
           ),
@@ -380,7 +502,7 @@ class _SearchPageState extends State<SearchPage> {
     );
   }
 
-  Widget _buildPlaylistsSection(List<dynamic> playlists) {
+  Widget _buildPlaylistsSection(List<PlaylistEntity> playlists) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -393,18 +515,29 @@ class _SearchPageState extends State<SearchPage> {
           ),
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 220,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: playlists.length,
-            itemBuilder: (context, index) {
-              final playlist = playlists[index]; // This is PlaylistEntity
-              return PlaylistCard(
-                playlist: playlist, // Đúng parameter name
-              );
-            },
-          ),
+        
+        // ✅ Sử dụng LayoutBuilder để tính toán space available
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return SizedBox(
+              height: 240, // ✅ Tăng height để đẹp hơn
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.zero,
+                itemCount: playlists.length,
+                itemBuilder: (context, index) {
+                  final playlist = playlists[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: PlaylistCard(
+                      playlist: playlist,
+                      width: 150, // ✅ Giữ kích thước đẹp
+                    ),
+                  );
+                },
+              ),
+            );
+          },
         ),
         const SizedBox(height: 20),
       ],

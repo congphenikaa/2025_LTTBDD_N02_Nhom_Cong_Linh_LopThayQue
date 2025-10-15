@@ -154,10 +154,20 @@ class SongListTitle extends StatelessWidget {
   }
 
   Widget _buildDuration(BuildContext context) {
-    if (song.duration == null) return const SizedBox.shrink();
+    // ✅ Thêm debug để kiểm tra
+    print('🎵 Song: ${song.title}');
+    print('🕐 Duration from Firebase: ${song.duration}');
+    
+    if (song.duration == null) {
+      print('⚠️ Duration is null for song: ${song.title}');
+      return const SizedBox.shrink();
+    }
+    
+    final formattedDuration = _formatDuration(song.duration!);
+    print('✅ Formatted duration: $formattedDuration');
     
     return Text(
-      _formatDuration(song.duration!),
+      formattedDuration,
       style: TextStyle(
         fontSize: 14,
         color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
@@ -177,8 +187,18 @@ class SongListTitle extends StatelessWidget {
   }
 
   String _formatDuration(int seconds) {
+    if (seconds < 0) return '0:00';
+    
     final minutes = seconds ~/ 60;
     final remainingSeconds = seconds % 60;
-    return '${minutes.toString().padLeft(1, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+    
+    // ✅ Format đẹp hơn
+    if (minutes >= 60) {
+      final hours = minutes ~/ 60;
+      final remainingMinutes = minutes % 60;
+      return '${hours}:${remainingMinutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
+    }
+    
+    return '${minutes}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 }

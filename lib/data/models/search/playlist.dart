@@ -37,24 +37,35 @@ class PlaylistModel extends Equatable {
       nameLowercase: json['name_lowercase'],
       description: json['description'],
       coverUrl: json['cover_url'],
-      creatorId: json['creator_id'] ?? json['created_by_id'], // Support both fields
-      creatorName: json['creator_name'] ?? json['created_by'], // Support both fields
-      trackCount: json['track_count'],
-      createdAt: json['created_at'] != null
-          ? (json['created_at'].runtimeType.toString().contains('Timestamp')
-              ? (json['created_at'] as dynamic).toDate()
-              : DateTime.tryParse(json['created_at'].toString()))
-          : null,
-      updatedAt: json['updated_at'] != null
-          ? (json['updated_at'].runtimeType.toString().contains('Timestamp')
-              ? (json['updated_at'] as dynamic).toDate()
-              : DateTime.tryParse(json['updated_at'].toString()))
-          : null,
+      creatorId: json['creator_id'],
+      creatorName: json['creator_name'], 
+      trackCount: _parseTrackCount(json['track_count']), // ✅ Safe parsing
+      createdAt: _parseTimestamp(json['created_at']),
+      updatedAt: _parseTimestamp(json['updated_at']),
       isPublic: json['is_public'] ?? false,
       isOwned: json['is_owned'] ?? false,
     );
   }
 
+  // ✅ Safe parsing methods
+  static int? _parseTrackCount(dynamic trackCount) {
+    if (trackCount == null) return null;
+    if (trackCount is int) return trackCount;
+    if (trackCount is String) return int.tryParse(trackCount);
+    if (trackCount is double) return trackCount.round();
+    return null;
+  }
+
+  static DateTime? _parseTimestamp(dynamic timestamp) {
+    if (timestamp == null) return null;
+    if (timestamp.runtimeType.toString().contains('Timestamp')) {
+      return (timestamp as dynamic).toDate();
+    }
+    if (timestamp is String) {
+      return DateTime.tryParse(timestamp);
+    }
+    return null;
+  }
   PlaylistEntity toEntity() {
     return PlaylistEntity(
       id: id,

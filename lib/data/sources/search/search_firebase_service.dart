@@ -213,27 +213,43 @@ Future<List<PlaylistModel>> _searchPlaylists(String query) async {
   try {
     print('🎵 Searching playlists with query: "$query"');
     
+    final String lowerQuery = query.toLowerCase();
+    final List<String> searchTerms = lowerQuery.split(' ').where((term) => term.isNotEmpty).toList();
+    
     final querySnapshot = await _firestore
         .collection('playlists')
-        .where('name_lowercase', isGreaterThanOrEqualTo: query)
-        .where('name_lowercase', isLessThan: query + '\uf8ff')
         .where('is_public', isEqualTo: true)
-        .limit(10)
+        .limit(50)
         .get();
 
     final List<PlaylistModel> playlists = [];
     
     for (final doc in querySnapshot.docs) {
       try {
-        final playlistData = {
-          'id': doc.id,
-          ...doc.data(),
-        };
-        playlists.add(PlaylistModel.fromJson(playlistData));
-        print('✅ Successfully created PlaylistModel for: ${playlistData['name']}');
+        final data = doc.data();
+        final nameLowercase = data['name_lowercase'] as String? ?? '';
+        final description = (data['description'] as String? ?? '').toLowerCase();
+        final creatorName = (data['creator_name'] as String? ?? '').toLowerCase();
+        
+        // ✅ Tìm kiếm từng term trong query
+        bool matches = searchTerms.any((term) => 
+          nameLowercase.contains(term) || 
+          description.contains(term) || 
+          creatorName.contains(term)
+        );
+        
+        if (matches) {
+          final playlistData = {
+            'id': doc.id,
+            ...data,
+          };
+          playlists.add(PlaylistModel.fromJson(playlistData));
+          print('✅ Found playlist: ${data['name']}');
+          
+          if (playlists.length >= 10) break;
+        }
       } catch (e) {
-        print('❌ Error creating PlaylistModel: $e');
-        print('❌ Raw playlist data: ${doc.data()}');
+        print('❌ Error processing playlist: $e');
       }
     }
 

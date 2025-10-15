@@ -33,9 +33,12 @@ class PlaylistCard extends StatelessWidget {
   Widget _buildVerticalLayout(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min, // ✅ Chỉ chiếm space cần thiết
       children: [
         // Playlist Cover
-        _buildPlaylistCover(),
+        Flexible( // ✅ Cho phép cover resize nếu cần
+          child: _buildPlaylistCover(),
+        ),
         const SizedBox(height: 12),
         
         // Playlist Name
@@ -46,7 +49,7 @@ class PlaylistCard extends StatelessWidget {
             fontWeight: FontWeight.w600,
             color: context.isDarkMode ? Colors.white : Colors.black,
           ),
-          maxLines: 1,
+          maxLines: 2, // ✅ Cho phép 2 dòng cho tên dài
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 4),
@@ -135,32 +138,29 @@ class PlaylistCard extends StatelessWidget {
   }
 
   Widget _buildPlaylistCover() {
-    return Container(
-      width: double.infinity,
-      height: isHorizontal ? 80 : 144,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.grey[300],
+    return AspectRatio(
+      aspectRatio: 1.0, 
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.grey[300],
+        ),
+        child: playlist.coverUrl != null
+            ? ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  playlist.coverUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => _buildDefaultCover(),
+                ),
+              )
+            : _buildDefaultCover(),
       ),
-      child: playlist.coverUrl != null
-          ? ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                playlist.coverUrl!,
-                width: double.infinity,
-                height: isHorizontal ? 80 : 144,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => _buildDefaultCover(),
-              ),
-            )
-          : _buildDefaultCover(),
     );
   }
 
   Widget _buildDefaultCover() {
     return Container(
-      width: double.infinity,
-      height: isHorizontal ? 80 : 144,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         gradient: LinearGradient(
@@ -170,10 +170,10 @@ class PlaylistCard extends StatelessWidget {
           ],
         ),
       ),
-      child: Icon(
+      child: const Icon(
         Icons.queue_music,
         color: Colors.white,
-        size: isHorizontal ? 40 : 60,
+        size: 50,
       ),
     );
   }

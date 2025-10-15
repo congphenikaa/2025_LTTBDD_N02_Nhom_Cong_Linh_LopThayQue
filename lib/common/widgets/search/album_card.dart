@@ -21,89 +21,85 @@ class AlbumCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardWidth = isHorizontal ? null : (width ?? _getResponsiveWidth(screenWidth));
+    
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: isHorizontal ? null : (width ?? 160),
+        width: cardWidth,
         padding: const EdgeInsets.all(8),
-        child: isHorizontal ? _buildHorizontalLayout(context) : _buildVerticalLayout(context),
+        child: isHorizontal 
+            ? _buildHorizontalLayout(context) 
+            : _buildVerticalLayout(context),
       ),
     );
   }
 
+  double _getResponsiveWidth(double screenWidth) {
+    if (screenWidth < 400) return 140;
+    if (screenWidth < 600) return 160;
+    return 180;
+  }
+
   Widget _buildVerticalLayout(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final fontSize = screenWidth < 400 ? 14.0 : 16.0;
+    final titleFontSize = screenWidth < 400 ? 15.0 : 16.0;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         // Album Cover
         Stack(
-          children: [
-            _buildAlbumCover(),
-            Positioned(
-              top: 8,
-              right: 8,
+        children: [
+          _buildAlbumCover(context),
+          Positioned(
+              top: 6,
+              right: 6,
               child: _buildFavoriteButton(context),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 8),
         
         // Album Title
-        Text(
-          album.title,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: context.isDarkMode ? Colors.white : Colors.black,
+        Flexible(
+          child: Text(
+            album.title,
+            style: TextStyle(
+              fontSize: titleFontSize,
+              fontWeight: FontWeight.w600,
+              color: context.isDarkMode ? Colors.white : Colors.black,
+              height: 1.2,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 4),
         
         // Artist Name
-        Text(
-          album.artist,
-          style: TextStyle(
-            fontSize: 14,
-            color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+        Flexible(
+          child: Text(
+            album.artist,
+            style: TextStyle(
+              fontSize: fontSize - 1,
+              color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              height: 1.2,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
         ),
         
         // Release Year & Track Count
         if (album.releaseDate != null || album.trackCount != null) ...[
           const SizedBox(height: 4),
-          Row(
-            children: [
-              if (album.releaseDate != null) ...[
-                Text(
-                  album.releaseDate!.year.toString(),
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: context.isDarkMode ? Colors.grey[500] : Colors.grey[500],
-                  ),
-                ),
-              ],
-              if (album.releaseDate != null && album.trackCount != null)
-                Text(
-                  ' • ',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: context.isDarkMode ? Colors.grey[500] : Colors.grey[500],
-                  ),
-                ),
-              if (album.trackCount != null)
-                Text(
-                  '${album.trackCount} tracks',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: context.isDarkMode ? Colors.grey[500] : Colors.grey[500],
-                  ),
-                ),
-            ],
+          Flexible(
+            child: _buildAlbumInfo(context, fontSize - 3),
           ),
         ],
       ],
@@ -111,93 +107,119 @@ class AlbumCard extends StatelessWidget {
   }
 
   Widget _buildHorizontalLayout(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final coverSize = screenWidth < 400 ? 60.0 : 80.0;
+    final fontSize = screenWidth < 400 ? 13.0 : 14.0;
+    final titleFontSize = screenWidth < 400 ? 14.0 : 16.0;
+    
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Album Cover
+          SizedBox(
+            width: coverSize,
+            height: coverSize,
+            child: _buildAlbumCover(context),
+          ),
+          SizedBox(width: screenWidth < 400 ? 8 : 12),
+          
+          // Album Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  album.title,
+                  style: TextStyle(
+                    fontSize: titleFontSize,
+                    fontWeight: FontWeight.w600,
+                    color: context.isDarkMode ? Colors.white : Colors.black,
+                    height: 1.2,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                
+                Text(
+                  album.artist,
+                  style: TextStyle(
+                    fontSize: fontSize,
+                    color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    height: 1.2,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                
+                if (album.releaseDate != null || album.trackCount != null) ...[
+                  const SizedBox(height: 2),
+                  _buildAlbumInfo(context, fontSize - 2),
+                ],
+              ],
+            ),
+          ),
+          
+          // Favorite Button
+          Padding(
+            padding: const EdgeInsets.only(left: 8),
+            child: _buildFavoriteButton(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAlbumInfo(BuildContext context, double fontSize) {
     return Row(
       children: [
-        // Album Cover
-        Stack(
-          children: [
-            SizedBox(
-              width: 80,
-              height: 80,
-              child: _buildAlbumCover(),
+        if (album.releaseDate != null) ...[
+          Flexible(
+            child: Text(
+              album.releaseDate!.year.toString(),
+              style: TextStyle(
+                fontSize: fontSize,
+                color: context.isDarkMode ? Colors.grey[500] : Colors.grey[500],
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
-          ],
-        ),
-        const SizedBox(width: 12),
-        
-        // Album Info
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                album.title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: context.isDarkMode ? Colors.white : Colors.black,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 4),
-              
-              Text(
-                album.artist,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              
-              if (album.releaseDate != null || album.trackCount != null) ...[
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    if (album.releaseDate != null) ...[
-                      Text(
-                        album.releaseDate!.year.toString(),
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: context.isDarkMode ? Colors.grey[500] : Colors.grey[500],
-                        ),
-                      ),
-                    ],
-                    if (album.releaseDate != null && album.trackCount != null)
-                      Text(
-                        ' • ',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: context.isDarkMode ? Colors.grey[500] : Colors.grey[500],
-                        ),
-                      ),
-                    if (album.trackCount != null)
-                      Text(
-                        '${album.trackCount} tracks',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: context.isDarkMode ? Colors.grey[500] : Colors.grey[500],
-                        ),
-                      ),
-                  ],
-                ),
-              ],
-            ],
           ),
-        ),
-        
-        // Favorite Button
-        _buildFavoriteButton(context),
+        ],
+        if (album.releaseDate != null && album.trackCount != null)
+          Text(
+            ' • ',
+            style: TextStyle(
+              fontSize: fontSize,
+              color: context.isDarkMode ? Colors.grey[500] : Colors.grey[500],
+            ),
+          ),
+        if (album.trackCount != null)
+          Flexible(
+            child: Text(
+              '${album.trackCount} tracks',
+              style: TextStyle(
+                fontSize: fontSize,
+                color: context.isDarkMode ? Colors.grey[500] : Colors.grey[500],
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
       ],
     );
   }
 
-  Widget _buildAlbumCover() {
+  Widget _buildAlbumCover(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final coverHeight = isHorizontal 
+        ? (screenWidth < 400 ? 60.0 : 80.0)
+        : (screenWidth < 400 ? 120.0 : 144.0);
+    
     return Container(
       width: double.infinity,
-      height: isHorizontal ? 80 : 144,
+      height: coverHeight,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         color: Colors.grey[300],
@@ -208,19 +230,27 @@ class AlbumCard extends StatelessWidget {
               child: Image.network(
                 album.coverUrl!,
                 width: double.infinity,
-                height: isHorizontal ? 80 : 144,
+                height: coverHeight,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => _buildDefaultCover(),
+                errorBuilder: (context, error, stackTrace) => _buildDefaultCover(context),
               ),
             )
-          : _buildDefaultCover(),
+          : _buildDefaultCover(context),
     );
   }
 
-  Widget _buildDefaultCover() {
+  Widget _buildDefaultCover(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final coverHeight = isHorizontal 
+        ? (screenWidth < 400 ? 60.0 : 80.0)
+        : (screenWidth < 400 ? 120.0 : 144.0);
+    final iconSize = isHorizontal 
+        ? (screenWidth < 400 ? 30.0 : 40.0)
+        : (screenWidth < 400 ? 45.0 : 60.0);
+    
     return Container(
       width: double.infinity,
-      height: isHorizontal ? 80 : 144,
+      height: coverHeight,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         gradient: LinearGradient(
@@ -233,7 +263,7 @@ class AlbumCard extends StatelessWidget {
       child: Icon(
         Icons.album,
         color: Colors.white,
-        size: isHorizontal ? 40 : 60,
+        size: iconSize,
       ),
     );
   }
@@ -241,9 +271,13 @@ class AlbumCard extends StatelessWidget {
   Widget _buildFavoriteButton(BuildContext context) {
     if (onFavoritePressed == null) return const SizedBox.shrink();
     
+    final screenWidth = MediaQuery.of(context).size.width;
+    final buttonSize = screenWidth < 400 ? 28.0 : 32.0;
+    final iconSize = screenWidth < 400 ? 16.0 : 18.0;
+    
     return Container(
-      width: 32,
-      height: 32,
+      width: buttonSize,
+      height: buttonSize,
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.6),
         shape: BoxShape.circle,
@@ -254,7 +288,7 @@ class AlbumCard extends StatelessWidget {
         icon: Icon(
           album.isFavorite ? Icons.favorite : Icons.favorite_border,
           color: album.isFavorite ? Colors.red : Colors.white,
-          size: 18,
+          size: iconSize,
         ),
       ),
     );

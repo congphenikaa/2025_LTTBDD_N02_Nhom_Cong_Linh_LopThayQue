@@ -15,6 +15,7 @@ import 'package:app_nghenhac/domain/usecases/auth/signup.dart';
 import 'package:app_nghenhac/domain/usecases/search/clear_search_history.dart';
 import 'package:app_nghenhac/domain/usecases/search/get_search_history.dart';
 import 'package:app_nghenhac/domain/usecases/search/get_search_suggestion.dart'; // Sửa tên file này
+import 'package:app_nghenhac/domain/usecases/search/save_search_query_usecase.dart';
 import 'package:app_nghenhac/domain/usecases/search/search.dart';
 import 'package:app_nghenhac/domain/usecases/song/add_or_remove_favorite_song.dart';
 import 'package:app_nghenhac/domain/usecases/song/get_favorite_songs.dart';
@@ -133,6 +134,10 @@ Future<void> initializeDependencies() async {
     GetSearchSuggestionsUseCase(searchRepository: sl<SearchRepository>())
   );
 
+  sl.registerLazySingleton<SaveSearchQueryUseCase>(
+  () => SaveSearchQueryUseCase(repository: sl()),
+);
+
   // Cubits
   sl.registerFactory<SongPlayerCubit>(
     () => SongPlayerCubit()
@@ -142,5 +147,6 @@ Future<void> initializeDependencies() async {
     searchUseCase: sl<SearchUseCase>(),
     getSearchHistoryUseCase: sl<GetSearchHistoryUseCase>(),
     clearSearchHistoryUseCase: sl<ClearSearchHistoryUseCase>(),
+    saveSearchQueryUseCase: sl(),
   ));
 }
