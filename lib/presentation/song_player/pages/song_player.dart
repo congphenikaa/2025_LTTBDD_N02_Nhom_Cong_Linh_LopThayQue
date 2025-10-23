@@ -1,4 +1,5 @@
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
+import 'package:app_nghenhac/common/widgets/drawer/app_drawer.dart';
 import 'package:app_nghenhac/common/widgets/favorite_button/favorite_button.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
 import 'package:app_nghenhac/core/constants/app_urls.dart';
@@ -26,13 +27,18 @@ class SongPlayerPages extends StatelessWidget {
             fontSize: 18
           ),
         ),
-        action: IconButton(
-          onPressed: (){}, 
-          icon: const Icon(
-            Icons.more_vert_rounded
-          )
+        action: Builder(
+          builder: (context) => IconButton(
+            onPressed: () {
+              Scaffold.of(context).openEndDrawer();
+            }, 
+            icon: const Icon(
+              Icons.menu
+            )
+          ),
         ),
       ),
+      endDrawer: const AppDrawer(),
       body: BlocProvider(
         create: (_) => sl<SongPlayerCubit>()..loadSong(
           '${AppURLs.songFirestorage}${songEntity.artist} - ${songEntity.title}.mp3?${AppURLs.mediaAlt}'

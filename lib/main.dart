@@ -11,18 +11,52 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory: kIsWeb
-        ? HydratedStorageDirectory.web
-        : HydratedStorageDirectory((await getTemporaryDirectory()).path),
-  );
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform
-  );
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    
+    // Initialize storage with error handling
+    try {
+      HydratedBloc.storage = await HydratedStorage.build(
+        storageDirectory: kIsWeb
+            ? HydratedStorageDirectory.web
+            : HydratedStorageDirectory((await getTemporaryDirectory()).path),
+      );
+    } catch (e) {
+      print('⚠️ HydratedBloc storage initialization failed: $e');
+      // Continue without hydrated storage if it fails
+    }
+    
+    // Initialize Firebase with error handling
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform
+      );
+      print('✅ Firebase initialized successfully');
+    } catch (e) {
+      print('❌ Firebase initialization failed: $e');
+      // Continue without Firebase if it fails
+    }
 
-  await initializeDependencies();
-  runApp(MyApp());
+    // Initialize dependencies
+    try {
+      await initializeDependencies();
+      print('✅ Dependencies initialized successfully');
+    } catch (e) {
+      print('❌ Dependencies initialization failed: $e');
+    }
+
+    runApp(MyApp());
+  } catch (e) {
+    print('❌ App initialization failed: $e');
+    // Still try to run the app with minimal setup
+    runApp(MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Text('App initialization error: $e'),
+        ),
+      ),
+    ));
+  }
 }
 
 class MyApp extends StatelessWidget {
