@@ -353,7 +353,7 @@ class _SearchPageState extends State<SearchPage> {
           title: Text(query),
           onTap: () {
             _searchController.text = query;
-            context.read<SearchCubit>().search(query);
+            _searchCubit.search(query);
           },
         );
       },
@@ -570,7 +570,7 @@ class _SearchPageState extends State<SearchPage> {
           ElevatedButton(
             onPressed: () {
               if (_searchController.text.isNotEmpty) {
-                context.read<SearchCubit>().search(_searchController.text);
+                _searchCubit.search(_searchController.text); // ✅ Dùng _searchCubit
               }
             },
             child: const Text('Try again'),

@@ -7,6 +7,8 @@ import 'package:app_nghenhac/data/sources/auth/auth_firebase_service.dart';
 import 'package:app_nghenhac/data/sources/search/search_firebase_service.dart';
 import 'package:app_nghenhac/data/sources/search/search_local_service.dart';
 import 'package:app_nghenhac/data/sources/song/song_firebase_service.dart';
+import 'package:app_nghenhac/data/sources/album/album_firebase_service.dart';
+import 'package:app_nghenhac/data/sources/playlist/playlist_firebase_service.dart';
 import 'package:app_nghenhac/domain/repository/auth/auth.dart';
 import 'package:app_nghenhac/domain/repository/search/search.dart';
 import 'package:app_nghenhac/domain/repository/song/song.dart';
@@ -23,6 +25,12 @@ import 'package:app_nghenhac/domain/usecases/song/get_favorite_songs.dart';
 import 'package:app_nghenhac/domain/usecases/song/get_news_songs.dart';
 import 'package:app_nghenhac/domain/usecases/song/get_play_list.dart';
 import 'package:app_nghenhac/domain/usecases/song/is_favorite_song.dart';
+import 'package:app_nghenhac/domain/usecases/album/get_albums.dart';
+import 'package:app_nghenhac/domain/usecases/playlist/get_playlists.dart';
+import 'package:app_nghenhac/domain/repository/album/album.dart';
+import 'package:app_nghenhac/domain/repository/playlist/playlist.dart';
+import 'package:app_nghenhac/data/repository/album/album_repository_impl.dart';
+import 'package:app_nghenhac/data/repository/playlist/playlist_repository_impl.dart';
 import 'package:app_nghenhac/presentation/search/bloc/search_cubit.dart';
 import 'package:app_nghenhac/presentation/song_player/bloc/song_player_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -65,6 +73,21 @@ Future<void> initializeDependencies() async {
     () => FirebaseStorageServiceImpl()
   );
 
+  // Album & Playlist Firebase Services
+  sl.registerSingleton<AlbumFirebaseService>(
+    AlbumFirebaseServiceImpl(
+      firestore: sl<FirebaseFirestore>(),
+      storageService: sl<FirebaseStorageService>(),
+    )
+  );
+
+  sl.registerSingleton<PlaylistFirebaseService>(
+    PlaylistFirebaseServiceImpl(
+      firestore: sl<FirebaseFirestore>(),
+      storageService: sl<FirebaseStorageService>(),
+    )
+  );
+
   // Repositories - Đăng ký cả interface và implementation
   sl.registerSingleton<AuthRepository>(
     AuthRepositoryImpl()
@@ -85,6 +108,15 @@ Future<void> initializeDependencies() async {
       firebaseService: sl<SearchFirebaseService>(),
       localService: sl<SearchLocalService>(),
     )
+  );
+
+  // Album & Playlist Repositories
+  sl.registerSingleton<AlbumRepository>(
+    AlbumRepositoryImpl(albumFirebaseService: sl<AlbumFirebaseService>())
+  );
+
+  sl.registerSingleton<PlaylistRepository>(
+    PlaylistRepositoryImpl(playlistFirebaseService: sl<PlaylistFirebaseService>())
   );
 
   // Use cases - Auth
@@ -121,6 +153,15 @@ Future<void> initializeDependencies() async {
     GetFavoriteSongsUseCase()
   );
 
+  // Use cases - Album & Playlist
+  sl.registerSingleton<GetAlbumsUseCase>(
+    GetAlbumsUseCase(repository: sl<AlbumRepository>())
+  );
+
+  sl.registerSingleton<GetPlaylistsUseCase>(
+    GetPlaylistsUseCase(repository: sl<PlaylistRepository>())
+  );
+
   // Use cases - Search
   sl.registerSingleton<SearchUseCase>(
     SearchUseCase(searchRepository: sl<SearchRepository>())
@@ -138,9 +179,9 @@ Future<void> initializeDependencies() async {
     GetSearchSuggestionsUseCase(searchRepository: sl<SearchRepository>())
   );
 
-  sl.registerLazySingleton<SaveSearchQueryUseCase>(
-  () => SaveSearchQueryUseCase(repository: sl()),
-);
+  sl.registerSingleton<SaveSearchQueryUseCase>(
+    SaveSearchQueryUseCase(repository: sl<SearchRepository>())
+  );
 
   // Cubits
   sl.registerFactory<SongPlayerCubit>(
@@ -151,6 +192,6 @@ Future<void> initializeDependencies() async {
     searchUseCase: sl<SearchUseCase>(),
     getSearchHistoryUseCase: sl<GetSearchHistoryUseCase>(),
     clearSearchHistoryUseCase: sl<ClearSearchHistoryUseCase>(),
-    saveSearchQueryUseCase: sl(),
+    saveSearchQueryUseCase: sl<SaveSearchQueryUseCase>(),
   ));
 }

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:get_it/get_it.dart';
 
 Future<void> main() async {
   try {
@@ -39,6 +40,9 @@ Future<void> main() async {
 
     // Initialize dependencies
     try {
+      // Clear existing dependencies to ensure fresh start
+      await sl.reset();
+      
       await initializeDependencies();
       print('✅ Dependencies initialized successfully');
     } catch (e) {
