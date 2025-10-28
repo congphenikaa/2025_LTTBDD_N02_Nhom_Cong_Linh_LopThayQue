@@ -74,6 +74,75 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
     emit(SongPlayerLoaded());
   }
 
+  // Tua tiến 5 giây
+  void seekForward5Seconds() {
+    if (_isDisposed) return;
+    
+    final newPosition = songPosition + const Duration(seconds: 5);
+    final maxPosition = songDuration;
+    
+    // Đảm bảo không vượt quá thời lượng bài hát
+    if (newPosition <= maxPosition) {
+      audioPlayer.seek(newPosition);
+    } else {
+      audioPlayer.seek(maxPosition);
+    }
+    
+    emit(SongPlayerLoaded());
+  }
+
+  // Tua lùi 5 giây
+  void seekBackward5Seconds() {
+    if (_isDisposed) return;
+    
+    final newPosition = songPosition - const Duration(seconds: 5);
+    
+    // Đảm bảo không nhỏ hơn 0
+    if (newPosition >= Duration.zero) {
+      audioPlayer.seek(newPosition);
+    } else {
+      audioPlayer.seek(Duration.zero);
+    }
+    
+    emit(SongPlayerLoaded());
+  }
+
+  // Tua đến vị trí cụ thể (cho slider)
+  void seekToPosition(Duration position) {
+    if (_isDisposed) return;
+    
+    audioPlayer.seek(position);
+    emit(SongPlayerLoaded());
+  }
+
+  // Chuyển bài tiếp theo (placeholder - cần implement với playlist)
+  void nextSong() {
+    if (_isDisposed) return;
+    
+    // TODO: Implement logic để chuyển sang bài tiếp theo trong playlist
+    print('🎵 Next song requested');
+    
+    // Tạm thời restart bài hiện tại
+    audioPlayer.seek(Duration.zero);
+    audioPlayer.play();
+    
+    emit(SongPlayerLoaded());
+  }
+
+  // Chuyển bài trước đó (placeholder - cần implement với playlist)
+  void previousSong() {
+    if (_isDisposed) return;
+    
+    // TODO: Implement logic để chuyển sang bài trước đó trong playlist
+    print('🎵 Previous song requested');
+    
+    // Tạm thời restart bài hiện tại
+    audioPlayer.seek(Duration.zero);
+    audioPlayer.play();
+    
+    emit(SongPlayerLoaded());
+  }
+
   @override
   Future<void> close() async {
     _isDisposed = true;

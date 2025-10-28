@@ -1,10 +1,26 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/domain/entities/search/artist.dart';
+import 'package:app_nghenhac/presentation/home/bloc/artists_cubit.dart';
+import 'package:app_nghenhac/presentation/home/bloc/artists_state.dart';
+import 'package:app_nghenhac/service_locator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-// Mock Artists List Widget  
+// Artists List Widget with Firebase Integration
 class ArtistsList extends StatelessWidget {
   const ArtistsList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => sl<ArtistsCubit>()..getArtists(limit: 20),
+      child: const _ArtistsContent(),
+    );
+  }
+}
+
+class _ArtistsContent extends StatelessWidget {
+  const _ArtistsContent();
 
   @override
   Widget build(BuildContext context) {
@@ -12,64 +28,91 @@ class ArtistsList extends StatelessWidget {
     final isTablet = screenWidth > 600;
     final isDesktop = screenWidth > 1200;
     
-    // Mock data for demonstration
-    final mockArtists = [
-      ArtistEntity(
-        id: '1',
-        name: 'Taylor Swift',
-        imageUrl: 'http://images4.fanpop.com/image/photos/15900000/taylor-swift-taylor-swift-15913910-1600-1200.jpg',
-        followers: 87654321,
-      ),
-      ArtistEntity(
-        id: '2', 
-        name: 'Drake',
-        imageUrl: 'https://citizenside.com/wp-content/uploads/2024/02/drakes-take-care-album-nearing-diamond-certification-says-producer-chase-n-cashe-1708573017.jpg',
-        followers: 76543210,
-      ),
-      ArtistEntity(
-        id: '3',
-        name: 'Ariana Grande',
-        imageUrl: 'https://d.musictimes.com/en/full/92446/ariana-grande.jpg',
-        followers: 65432109,
-      ),
-      ArtistEntity(
-        id: '4',
-        name: 'The Weeknd',
-        imageUrl: 'https://wallpapers.com/images/hd/the-weeknd-headshot-quwd94h55usagnpg.jpg',
-        followers: 54321098,
-      ),
-      ArtistEntity(
-        id: '5',
-        name: 'Billie Eilish',
-        imageUrl: 'https://wallpapers.com/images/hd/billie-eilish-jmnrb3mq3alp1o8f.jpg',
-        followers: 43210987,
-      ),
-      ArtistEntity(
-        id: '6',
-        name: 'Ed Sheeran',
-        imageUrl: 'https://www.euphoriazine.com/wp-content/uploads/2020/12/Photo-credit-Mark-Surridge-HIGH-RES-scaled-e1608593526642.jpg',
-        followers: 32109876,
-      ),
-    ];
-
     return Center(
       child: Container(
         constraints: BoxConstraints(
           maxWidth: isDesktop ? 1200 : double.infinity,
         ),
-        child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          padding: EdgeInsets.symmetric(
-            horizontal: isDesktop ? 32 : (isTablet ? 24 : 16)
-          ),
-          itemBuilder: (context, index) {
-            return _artistCard(mockArtists[index], context, 
-              isDesktop: isDesktop, isTablet: isTablet);
+        child: BlocBuilder<ArtistsCubit, ArtistsState>(
+          builder: (context, state) {
+            if (state is ArtistsLoading) {
+              return const SizedBox(
+                height: 150,
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              );
+            }
+            
+            if (state is ArtistsLoadFailure) {
+              return SizedBox(
+                height: 150,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Không thể tải danh sách nghệ sĩ',
+                        style: TextStyle(
+                          color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          context.read<ArtistsCubit>().getArtists(limit: 20);
+                        },
+                        child: const Text('Thử lại'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            
+            if (state is ArtistsLoaded) {
+              final artists = state.artists;
+              
+              if (artists.isEmpty) {
+                return SizedBox(
+                  height: 150,
+                  child: Center(
+                    child: Text(
+                      'Không có nghệ sĩ nào',
+                      style: TextStyle(
+                        color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                );
+              }
+              
+              return ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.symmetric(
+                  horizontal: isDesktop ? 32 : (isTablet ? 24 : 16)
+                ),
+                itemBuilder: (context, index) {
+                  return _artistCard(artists[index], context, 
+                    isDesktop: isDesktop, isTablet: isTablet);
+                },
+                separatorBuilder: (context, index) => SizedBox(
+                  width: isDesktop ? 20 : (isTablet ? 16 : 14)
+                ),
+                itemCount: artists.length,
+              );
+            }
+            
+            return const SizedBox.shrink();
           },
-          separatorBuilder: (context, index) => SizedBox(
-            width: isDesktop ? 20 : (isTablet ? 16 : 14)
-          ),
-          itemCount: mockArtists.length,
         ),
       ),
     );

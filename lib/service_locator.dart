@@ -9,6 +9,7 @@ import 'package:app_nghenhac/data/sources/search/search_local_service.dart';
 import 'package:app_nghenhac/data/sources/song/song_firebase_service.dart';
 import 'package:app_nghenhac/data/sources/album/album_firebase_service.dart';
 import 'package:app_nghenhac/data/sources/playlist/playlist_firebase_service.dart';
+import 'package:app_nghenhac/data/sources/artist/artist_firebase_service.dart';
 import 'package:app_nghenhac/domain/repository/auth/auth.dart';
 import 'package:app_nghenhac/domain/repository/search/search.dart';
 import 'package:app_nghenhac/domain/repository/song/song.dart';
@@ -17,7 +18,7 @@ import 'package:app_nghenhac/domain/usecases/auth/signin.dart';
 import 'package:app_nghenhac/domain/usecases/auth/signup.dart';
 import 'package:app_nghenhac/domain/usecases/search/clear_search_history.dart';
 import 'package:app_nghenhac/domain/usecases/search/get_search_history.dart';
-import 'package:app_nghenhac/domain/usecases/search/get_search_suggestion.dart'; // Sửa tên file này
+import 'package:app_nghenhac/domain/usecases/search/get_search_suggestion.dart';
 import 'package:app_nghenhac/domain/usecases/search/save_search_query_usecase.dart';
 import 'package:app_nghenhac/domain/usecases/search/search.dart';
 import 'package:app_nghenhac/domain/usecases/song/add_or_remove_favorite_song.dart';
@@ -27,12 +28,16 @@ import 'package:app_nghenhac/domain/usecases/song/get_play_list.dart';
 import 'package:app_nghenhac/domain/usecases/song/is_favorite_song.dart';
 import 'package:app_nghenhac/domain/usecases/album/get_albums.dart';
 import 'package:app_nghenhac/domain/usecases/playlist/get_playlists.dart';
+import 'package:app_nghenhac/domain/usecases/artist/get_artists.dart';
 import 'package:app_nghenhac/domain/repository/album/album.dart';
 import 'package:app_nghenhac/domain/repository/playlist/playlist.dart';
+import 'package:app_nghenhac/domain/repository/artist/artist.dart';
 import 'package:app_nghenhac/data/repository/album/album_repository_impl.dart';
 import 'package:app_nghenhac/data/repository/playlist/playlist_repository_impl.dart';
+import 'package:app_nghenhac/data/repository/artist/artist_repository_impl.dart';
 import 'package:app_nghenhac/presentation/search/bloc/search_cubit.dart';
 import 'package:app_nghenhac/presentation/song_player/bloc/song_player_cubit.dart';
+import 'package:app_nghenhac/presentation/home/bloc/artists_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
@@ -88,6 +93,13 @@ Future<void> initializeDependencies() async {
     )
   );
 
+  sl.registerSingleton<ArtistFirebaseService>(
+    ArtistFirebaseServiceImpl(
+      firestore: sl<FirebaseFirestore>(),
+      storageService: sl<FirebaseStorageService>(),
+    )
+  );
+
   // Repositories - Đăng ký cả interface và implementation
   sl.registerSingleton<AuthRepository>(
     AuthRepositoryImpl()
@@ -117,6 +129,10 @@ Future<void> initializeDependencies() async {
 
   sl.registerSingleton<PlaylistRepository>(
     PlaylistRepositoryImpl(playlistFirebaseService: sl<PlaylistFirebaseService>())
+  );
+
+  sl.registerSingleton<ArtistRepository>(
+    ArtistRepositoryImpl(artistFirebaseService: sl<ArtistFirebaseService>())
   );
 
   // Use cases - Auth
@@ -162,6 +178,10 @@ Future<void> initializeDependencies() async {
     GetPlaylistsUseCase(repository: sl<PlaylistRepository>())
   );
 
+  sl.registerSingleton<GetArtistsUseCase>(
+    GetArtistsUseCase(repository: sl<ArtistRepository>())
+  );
+
   // Use cases - Search
   sl.registerSingleton<SearchUseCase>(
     SearchUseCase(searchRepository: sl<SearchRepository>())
@@ -194,4 +214,8 @@ Future<void> initializeDependencies() async {
     clearSearchHistoryUseCase: sl<ClearSearchHistoryUseCase>(),
     saveSearchQueryUseCase: sl<SaveSearchQueryUseCase>(),
   ));
+
+  sl.registerFactory<ArtistsCubit>(
+    () => ArtistsCubit(getArtistsUseCase: sl<GetArtistsUseCase>())
+  );
 }

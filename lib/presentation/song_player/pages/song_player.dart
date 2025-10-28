@@ -1,3 +1,4 @@
+import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/common/widgets/drawer/app_drawer.dart';
 import 'package:app_nghenhac/common/widgets/favorite_button/favorite_button.dart';
@@ -117,13 +118,19 @@ class SongPlayerPages extends StatelessWidget {
         if(state is SongPlayerLoaded) {
           return Column(
             children: [
+              // Slider với khả năng tương tác
               Slider(
                 value: context.read<SongPlayerCubit>().songPosition.inSeconds.toDouble(), 
                 min: 0.0,
                 max: context.read<SongPlayerCubit>().songDuration.inSeconds.toDouble(),
-                onChanged: (value){}
+                onChanged: (value) {
+                  final newPosition = Duration(seconds: value.toInt());
+                  context.read<SongPlayerCubit>().seekToPosition(newPosition);
+                }
               ),
               const SizedBox(height: 20),
+              
+              // Hiển thị thời gian
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -139,23 +146,112 @@ class SongPlayerPages extends StatelessWidget {
                   )
                 ],
               ),
-              const SizedBox(height: 20,),
+              const SizedBox(height: 30),
 
-              GestureDetector(
-                onTap: (){
-                  context.read<SongPlayerCubit>().playOrPauseSong();
-                },
-                child: Container(
-                  height: 60,
-                  width: 60,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primary
+              // Các nút điều khiển
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Nút bài trước
+                  GestureDetector(
+                    onTap: () {
+                      context.read<SongPlayerCubit>().previousSong();
+                    },
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: context.isDarkMode ? Colors.grey[800] : Colors.black45,
+                      ),
+                      child: const Icon(
+                        Icons.skip_previous,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
                   ),
-                  child: Icon(
-                    context.read<SongPlayerCubit>().audioPlayer.playing ? Icons.pause : Icons.play_arrow
+                  
+                  // Nút tua lùi 5 giây
+                  GestureDetector(
+                    onTap: () {
+                      context.read<SongPlayerCubit>().seekBackward5Seconds();
+                    },
+                    child: Container(
+                      height: 45,
+                      width: 45,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: context.isDarkMode ? Colors.grey[800] : Colors.black45,
+                      ),
+                      child: const Icon(
+                        Icons.replay_5,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
                   ),
-                ),
+                  
+                  // Nút play/pause chính
+                  GestureDetector(
+                    onTap: (){
+                      context.read<SongPlayerCubit>().playOrPauseSong();
+                    },
+                    child: Container(
+                      height: 60,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: context.isDarkMode ? Colors.grey[800] : Colors.black45,
+                      ),
+                      child: Icon(
+                        context.read<SongPlayerCubit>().audioPlayer.playing ? Icons.pause : Icons.play_arrow,
+                        color: Colors.white,
+                        size: 32,
+                      ),
+                    ),
+                  ),
+                  
+                  // Nút tua tiến 5 giây
+                  GestureDetector(
+                    onTap: () {
+                      context.read<SongPlayerCubit>().seekForward5Seconds();
+                    },
+                    child: Container(
+                      height: 45,
+                      width: 45,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: context.isDarkMode ? Colors.grey[800] : Colors.black45,
+                      ),
+                      child: const Icon(
+                        Icons.forward_5,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                  
+                  // Nút bài tiếp theo
+                  GestureDetector(
+                    onTap: () {
+                      context.read<SongPlayerCubit>().nextSong();
+                    },
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: context.isDarkMode ? Colors.grey[800] : Colors.black45,
+                      ),
+                      child: const Icon(
+                        Icons.skip_next,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                ],
               )
             ],
           );

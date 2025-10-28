@@ -1,7 +1,7 @@
-import 'package:app_nghenhac/common/widgets/search/album_card.dart';
-import 'package:app_nghenhac/common/widgets/search/artist_card.dart';
-import 'package:app_nghenhac/common/widgets/search/play_list_card.dart';
-import 'package:app_nghenhac/common/widgets/search/song_list_title.dart';
+import 'package:app_nghenhac/presentation/search/widgets/album_card.dart';
+import 'package:app_nghenhac/presentation/search/widgets/artist_card.dart';
+import 'package:app_nghenhac/presentation/search/widgets/play_list_card.dart';
+import 'package:app_nghenhac/presentation/search/widgets/song_list_title.dart';
 import 'package:app_nghenhac/domain/entities/search/album.dart';
 import 'package:app_nghenhac/domain/entities/search/artist.dart';
 import 'package:app_nghenhac/domain/entities/search/playlist.dart';
