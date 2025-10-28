@@ -29,15 +29,20 @@ import 'package:app_nghenhac/domain/usecases/song/is_favorite_song.dart';
 import 'package:app_nghenhac/domain/usecases/album/get_albums.dart';
 import 'package:app_nghenhac/domain/usecases/playlist/get_playlists.dart';
 import 'package:app_nghenhac/domain/usecases/artist/get_artists.dart';
+import 'package:app_nghenhac/domain/usecases/artist/get_artist_details.dart';
+import 'package:app_nghenhac/domain/usecases/artist/get_artist_albums.dart';
+import 'package:app_nghenhac/domain/usecases/artist/get_artist_songs.dart';
 import 'package:app_nghenhac/domain/repository/album/album.dart';
 import 'package:app_nghenhac/domain/repository/playlist/playlist.dart';
 import 'package:app_nghenhac/domain/repository/artist/artist.dart';
 import 'package:app_nghenhac/data/repository/album/album_repository_impl.dart';
 import 'package:app_nghenhac/data/repository/playlist/playlist_repository_impl.dart';
 import 'package:app_nghenhac/data/repository/artist/artist_repository_impl.dart';
+import 'package:app_nghenhac/data/sources/song/song_search_service.dart';
 import 'package:app_nghenhac/presentation/search/bloc/search_cubit.dart';
 import 'package:app_nghenhac/presentation/song_player/bloc/song_player_cubit.dart';
 import 'package:app_nghenhac/presentation/home/bloc/artists_cubit.dart';
+import 'package:app_nghenhac/presentation/artist/bloc/artist_detail_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
@@ -95,6 +100,14 @@ Future<void> initializeDependencies() async {
 
   sl.registerSingleton<ArtistFirebaseService>(
     ArtistFirebaseServiceImpl(
+      firestore: sl<FirebaseFirestore>(),
+      storageService: sl<FirebaseStorageService>(),
+    )
+  );
+
+  // Song Search Service for Artist Detail
+  sl.registerSingleton<SongSearchService>(
+    SongSearchServiceImpl(
       firestore: sl<FirebaseFirestore>(),
       storageService: sl<FirebaseStorageService>(),
     )
@@ -182,6 +195,19 @@ Future<void> initializeDependencies() async {
     GetArtistsUseCase(repository: sl<ArtistRepository>())
   );
 
+  // Artist Detail Use Cases
+  sl.registerSingleton<GetArtistDetailsUseCase>(
+    GetArtistDetailsUseCase(repository: sl<ArtistRepository>())
+  );
+
+  sl.registerSingleton<GetArtistAlbumsUseCase>(
+    GetArtistAlbumsUseCase(repository: sl<AlbumRepository>())
+  );
+
+  sl.registerSingleton<GetArtistSongsUseCase>(
+    GetArtistSongsUseCase(repository: sl<SongsRepository>())
+  );
+
   // Use cases - Search
   sl.registerSingleton<SearchUseCase>(
     SearchUseCase(searchRepository: sl<SearchRepository>())
@@ -217,5 +243,13 @@ Future<void> initializeDependencies() async {
 
   sl.registerFactory<ArtistsCubit>(
     () => ArtistsCubit(getArtistsUseCase: sl<GetArtistsUseCase>())
+  );
+
+  sl.registerFactory<ArtistDetailCubit>(
+    () => ArtistDetailCubit(
+      getArtistDetailsUseCase: sl<GetArtistDetailsUseCase>(),
+      getArtistAlbumsUseCase: sl<GetArtistAlbumsUseCase>(),
+      getArtistSongsUseCase: sl<GetArtistSongsUseCase>(),
+    )
   );
 }

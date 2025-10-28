@@ -24,4 +24,20 @@ class AlbumRepositoryImpl implements AlbumRepository {
       throw Exception('Failed to load albums: ${e.toString()}');
     }
   }
+
+  @override
+  Future<List<AlbumEntity>> getAlbumsByArtist(String artistId) async {
+    try {
+      print('🔍 AlbumRepository: Calling AlbumFirebaseService to get albums for artistId: $artistId');
+      
+      final albums = await _albumFirebaseService.getAlbumsByArtist(artistId);
+      
+      print('📊 AlbumRepository: Received ${albums.length} albums for artist from service');
+      return albums;
+      
+    } catch (e) {
+      print('💥 AlbumRepository: Error in getAlbumsByArtist: $e');
+      return [];
+    }
+  }
 }

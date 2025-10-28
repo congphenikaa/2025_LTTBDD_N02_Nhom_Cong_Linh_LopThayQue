@@ -2,6 +2,7 @@ import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/domain/entities/search/artist.dart';
 import 'package:app_nghenhac/presentation/home/bloc/artists_cubit.dart';
 import 'package:app_nghenhac/presentation/home/bloc/artists_state.dart';
+import 'package:app_nghenhac/presentation/artist/pages/artist_detail.dart';
 import 'package:app_nghenhac/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -125,10 +126,10 @@ class _ArtistsContent extends StatelessWidget {
     
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Tapped on ${artist.name}'),
-            duration: const Duration(seconds: 1),
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ArtistDetailPage(artist: artist),
           ),
         );
       },
@@ -144,7 +145,12 @@ class _ArtistsContent extends StatelessWidget {
                 shape: BoxShape.circle,
                 image: DecorationImage(
                   fit: BoxFit.cover,
-                  image: NetworkImage(artist.imageUrl ?? 'https://via.placeholder.com/120x120/CCCCCC/FFFFFF?text=?'),
+                  image: artist.imageUrl != null && artist.imageUrl!.isNotEmpty
+                      ? NetworkImage(artist.imageUrl!)
+                      : const AssetImage('assets/images/artist.png') as ImageProvider,
+                  onError: (error, stackTrace) {
+                    print('🖼️ Error loading artist image: $error');
+                  },
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -161,7 +167,7 @@ class _ArtistsContent extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: isDesktop ? 16 : (isTablet ? 15 : 14),
-                color: context.isDarkMode ? Colors.white : Colors.black,
+                color: context.isDarkMode ? Colors.white : Colors.black87,
               ),
               textAlign: TextAlign.center,
               maxLines: 2,

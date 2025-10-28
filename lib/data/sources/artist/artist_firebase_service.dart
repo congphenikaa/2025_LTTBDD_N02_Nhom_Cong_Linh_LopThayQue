@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class ArtistFirebaseService {
   Future<List<ArtistEntity>> getArtists({int limit = 20});
+  Future<ArtistEntity?> getArtistDetails(String artistId);
 }
 
 class ArtistFirebaseServiceImpl implements ArtistFirebaseService {
@@ -84,6 +85,61 @@ class ArtistFirebaseServiceImpl implements ArtistFirebaseService {
     } catch (e) {
       print('💥 ArtistFirebaseService: Error fetching artists: $e');
       return [];
+    }
+  }
+
+  @override
+  Future<ArtistEntity?> getArtistDetails(String artistId) async {
+    try {
+      print('🔍 ArtistFirebaseService: Fetching details for artist: $artistId');
+      
+      final docSnapshot = await _firestore
+          .collection('artists')
+          .doc(artistId)
+          .get();
+
+      if (!docSnapshot.exists) {
+        print('❌ ArtistFirebaseService: Artist not found: $artistId');
+        return null;
+      }
+
+      final data = docSnapshot.data()!;
+      print('🎤 Processing artist details: ${data['name'] ?? 'Unknown'}');
+
+      // Determine which field contains the storage path
+      String? storagePath;
+      if (data['image_storage_path'] != null && data['image_storage_path'].toString().isNotEmpty) {
+        storagePath = data['image_storage_path'];
+      } else if (data['image_url'] != null && 
+                 data['image_url'].toString().isNotEmpty && 
+                 !data['image_url'].toString().startsWith('http') && 
+                 !data['image_url'].toString().startsWith('https')) {
+        storagePath = data['image_url'];
+      }
+      
+      // Convert Firebase Storage path to download URL if needed
+      String? finalImageUrl = data['image_url'];
+      if (storagePath != null) {
+        print('🔄 Converting storage path to download URL: $storagePath');
+        finalImageUrl = await _storageService.getDownloadUrl(storagePath);
+        print('✅ Final Image URL: ${finalImageUrl?.substring(0, 50)}...');
+      }
+      
+      final artistData = {
+        'id': docSnapshot.id,
+        ...data,
+        'image_url': finalImageUrl,
+      };
+      
+      final artistModel = ArtistModel.fromJson(artistData);
+      final artistEntity = artistModel.toEntity();
+      
+      print('✅ Successfully loaded artist details: ${artistEntity.name}');
+      return artistEntity;
+      
+    } catch (e) {
+      print('💥 ArtistFirebaseService: Error fetching artist details: $e');
+      return null;
     }
   }
 }

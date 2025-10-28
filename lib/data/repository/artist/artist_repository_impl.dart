@@ -25,4 +25,20 @@ class ArtistRepositoryImpl implements ArtistRepository {
       return [];
     }
   }
+
+  @override
+  Future<ArtistEntity?> getArtistDetails(String artistId) async {
+    try {
+      print('🔍 [ArtistRepository] Getting details for artist: $artistId');
+      
+      final artist = await _artistFirebaseService.getArtistDetails(artistId);
+      
+      print('📊 [ArtistRepository] Artist details result: ${artist?.name ?? 'null'}');
+      return artist;
+      
+    } catch (e) {
+      print('💥 [ArtistRepository] Error fetching artist details: $e');
+      return null;
+    }
+  }
 }

@@ -5,9 +5,9 @@ class SongEntity {
   final String? artistId;
   final String? album;
   final String? albumId;
-  final String? coverStoragePath;  // Storage path thay vì URL
-  final String? audioStoragePath;  // Storage path thay vì URL
-  final int? duration; // in seconds
+  final String? coverStoragePath;  
+  final String? audioStoragePath;  
+  final int? duration; 
   final DateTime? releaseDate;
   final List<String>? genres;
   final bool isFavorite;

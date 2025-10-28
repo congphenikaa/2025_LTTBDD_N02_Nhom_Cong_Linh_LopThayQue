@@ -59,6 +59,8 @@ class SongModel extends Equatable {
             ? List<String>.from(json['genres'])
             : null,
         isFavorite: json['is_favorite'] ?? false,
+        coverUrl: json['cover_url'],
+        audioUrl: json['audio_url'],
       );
     } catch (e) {
       print('❌ Error in SongModel.fromJson: $e');

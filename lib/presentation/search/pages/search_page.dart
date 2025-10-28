@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
-
 import 'package:app_nghenhac/service_locator.dart';
 import '../bloc/search_cubit.dart';
 import '../bloc/search_state.dart';
