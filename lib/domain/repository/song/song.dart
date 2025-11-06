@@ -9,4 +9,5 @@ abstract class SongsRepository {
   Future<Either> getUserFavoriteSongs();
   Future<List<SongEntity>> getSongsByArtist(String artistId);
   Future<List<SongEntity>> getSongsByAlbum(String albumId);
+  Future<List<SongEntity>> getSongsByPlaylist(String playlistId);
 }

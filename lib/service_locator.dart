@@ -25,6 +25,7 @@ import 'package:app_nghenhac/domain/usecases/song/add_or_remove_favorite_song.da
 import 'package:app_nghenhac/domain/usecases/song/get_favorite_songs.dart';
 import 'package:app_nghenhac/domain/usecases/song/get_news_songs.dart';
 import 'package:app_nghenhac/domain/usecases/song/get_play_list.dart';
+import 'package:app_nghenhac/domain/usecases/song/get_playlist_songs.dart';
 import 'package:app_nghenhac/domain/usecases/song/is_favorite_song.dart';
 import 'package:app_nghenhac/domain/usecases/album/get_albums.dart';
 import 'package:app_nghenhac/domain/usecases/album/get_album_details.dart';
@@ -46,6 +47,7 @@ import 'package:app_nghenhac/presentation/song_player/bloc/song_player_cubit.dar
 import 'package:app_nghenhac/presentation/home/bloc/artists_cubit.dart';
 import 'package:app_nghenhac/presentation/artist/bloc/artist_detail_cubit.dart';
 import 'package:app_nghenhac/presentation/album/bloc/album_cubit.dart';
+import 'package:app_nghenhac/presentation/playlist/bloc/playlist_detail_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
@@ -173,6 +175,10 @@ Future<void> initializeDependencies() async {
     GetPlayListUseCase()
   );
 
+  sl.registerSingleton<GetPlaylistSongsUseCase>(
+    GetPlaylistSongsUseCase()
+  );
+
   sl.registerSingleton<AddOrRemoveFavoriteSongUseCase>(
     AddOrRemoveFavoriteSongUseCase()
   );
@@ -269,5 +275,9 @@ Future<void> initializeDependencies() async {
       getAlbumDetailsUseCase: sl<GetAlbumDetailsUseCase>(),
       getSongsByAlbumUseCase: sl<GetSongsByAlbumUseCase>(),
     )
+  );
+
+  sl.registerFactory<PlaylistDetailCubit>(
+    () => PlaylistDetailCubit()
   );
 }

@@ -2,6 +2,7 @@ import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
 import 'package:app_nghenhac/domain/entities/search/playlist.dart';
 import 'package:app_nghenhac/domain/usecases/playlist/get_playlists.dart';
+import 'package:app_nghenhac/presentation/playlist/pages/playlist_detail_page.dart';
 import 'package:app_nghenhac/service_locator.dart';
 import 'package:flutter/material.dart';
 
@@ -210,10 +211,11 @@ class _PlaylistsListState extends State<PlaylistsList> {
     
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Playlist: ${playlist.name}'),
-            duration: Duration(seconds: 2),
+        // Navigate to PlaylistDetailPage
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PlaylistDetailPage(playlist: playlist),
           ),
         );
       },

@@ -67,4 +67,20 @@ class SongRepositoryImpl extends SongsRepository {
     }
   }
 
+  @override
+  Future<List<SongEntity>> getSongsByPlaylist(String playlistId) async {
+    try {
+      print('🔍 [SongRepository] Getting songs for playlistId: $playlistId');
+      
+      final songSearchService = sl<SongSearchService>();
+      final songs = await songSearchService.getSongsByPlaylist(playlistId);
+      print('📊 [SongRepository] Received ${songs.length} songs for playlist from search service');
+      return songs;
+      
+    } catch (e) {
+      print('💥 [SongRepository] Error fetching songs for playlist: $e');
+      return [];
+    }
+  }
+
 } 
