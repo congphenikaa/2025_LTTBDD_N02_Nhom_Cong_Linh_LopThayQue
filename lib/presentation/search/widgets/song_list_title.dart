@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:app_nghenhac/domain/entities/search/song.dart';
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/presentation/search_song_player/pages/search_song_player.dart';
 
 class SongListTitle extends StatelessWidget {
   final SongEntity song;
@@ -24,7 +25,15 @@ class SongListTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: onTap ?? () {
+        // Navigate to SearchSongPlayerPages when song is tapped
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SearchSongPlayerPages(songEntity: song),
+          ),
+        );
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Row(

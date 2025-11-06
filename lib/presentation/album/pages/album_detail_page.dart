@@ -6,6 +6,7 @@ import 'package:app_nghenhac/presentation/album/bloc/album_state.dart';
 import 'package:app_nghenhac/presentation/album/widgets/album_header.dart';
 import 'package:app_nghenhac/presentation/album/widgets/album_songs_list.dart';
 import 'package:app_nghenhac/presentation/album/widgets/album_action_buttons.dart';
+import 'package:app_nghenhac/presentation/album/widgets/album_mini_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -37,6 +38,43 @@ class AlbumDetailPage extends StatelessWidget {
                 ..._buildContentSlivers(state as AlbumLoaded, context, isDesktop, isTablet),
             ],
           );
+        },
+      ),
+      // Add mini player when song is playing
+      bottomNavigationBar: BlocBuilder<AlbumCubit, AlbumState>(
+        builder: (context, state) {
+          if (state is AlbumSongPlaying) {
+            final currentSong = state.songs[state.currentSongIndex];
+            return Container(
+              padding: EdgeInsets.only(
+                left: isDesktop ? 24 : (isTablet ? 20 : 16),
+                right: isDesktop ? 24 : (isTablet ? 20 : 16),
+                bottom: isDesktop ? 24 : (isTablet ? 20 : 16),
+                top: isDesktop ? 16 : (isTablet ? 12 : 8),
+              ),
+              decoration: BoxDecoration(
+                color: context.isDarkMode 
+                    ? Colors.black.withOpacity(0.95)
+                    : Colors.white.withOpacity(0.95),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: SafeArea(
+                child: AlbumMiniPlayer(
+                  currentSong: currentSong,
+                  isPlaying: state.isPlaying,
+                  isDesktop: isDesktop,
+                  isTablet: isTablet,
+                ),
+              ),
+            );
+          }
+          return const SizedBox.shrink();
         },
       ),
     );

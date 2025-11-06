@@ -1,5 +1,9 @@
 import 'package:app_nghenhac/domain/entities/search/album.dart';
+import 'package:app_nghenhac/presentation/album/pages/album_detail_page.dart';
+import 'package:app_nghenhac/presentation/album/bloc/album_cubit.dart';
+import 'package:app_nghenhac/service_locator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
 
@@ -25,7 +29,18 @@ class AlbumCard extends StatelessWidget {
     final cardWidth = isHorizontal ? null : (width ?? _getResponsiveWidth(screenWidth));
     
     return InkWell(
-      onTap: onTap,
+      onTap: onTap ?? () {
+        // Navigate to AlbumDetailPage when album is tapped
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BlocProvider(
+              create: (context) => sl<AlbumCubit>()..loadAlbumDetails(album.id),
+              child: AlbumDetailPage(album: album),
+            ),
+          ),
+        );
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         width: cardWidth,

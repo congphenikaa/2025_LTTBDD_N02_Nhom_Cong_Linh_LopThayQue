@@ -1,4 +1,5 @@
 import 'package:app_nghenhac/domain/entities/search/artist.dart';
+import 'package:app_nghenhac/presentation/artist/pages/artist_detail.dart';
 import 'package:flutter/material.dart';
 
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
@@ -24,7 +25,15 @@ class ArtistCard extends StatelessWidget {
     final cardWidth = isHorizontal ? null : _calculateCardWidth(screenWidth);
     
     return InkWell(
-      onTap: onTap,
+      onTap: onTap ?? () {
+        // Navigate to ArtistDetailPage when artist is tapped
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ArtistDetailPage(artist: artist),
+          ),
+        );
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         width: cardWidth,
@@ -265,19 +274,5 @@ class ArtistCard extends StatelessWidget {
       return '${(followers / 1000).toStringAsFixed(1)}K';
     }
     return followers.toString();
-  }
-  
-  // Helper methods for responsive design
-  bool _isSmallScreen(BuildContext context) {
-    return MediaQuery.of(context).size.width < 360;
-  }
-  
-  bool _isMediumScreen(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    return width >= 360 && width < 600;
-  }
-  
-  bool _isLargeScreen(BuildContext context) {
-    return MediaQuery.of(context).size.width >= 600;
   }
 }

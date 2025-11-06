@@ -39,28 +39,46 @@ class SongSearchServiceImpl implements SongSearchService {
           
           print('🎵 Processing song: ${data['title'] ?? 'Unknown'}');
           
-          // Determine which field contains the storage path
-          String? storagePath;
+          // Determine which field contains the cover storage path
+          String? coverStoragePath;
           if (data['cover_storage_path'] != null && data['cover_storage_path'].toString().isNotEmpty) {
-            storagePath = data['cover_storage_path'];
+            coverStoragePath = data['cover_storage_path'];
           } else if (data['cover_url'] != null && 
                      data['cover_url'].toString().isNotEmpty && 
                      !data['cover_url'].toString().startsWith('http')) {
-            storagePath = data['cover_url'];
+            coverStoragePath = data['cover_url'];
+          }
+          
+          // Determine which field contains the audio storage path
+          String? audioStoragePath;
+          if (data['audio_storage_path'] != null && data['audio_storage_path'].toString().isNotEmpty) {
+            audioStoragePath = data['audio_storage_path'];
+          } else if (data['audio_url'] != null && 
+                     data['audio_url'].toString().isNotEmpty && 
+                     !data['audio_url'].toString().startsWith('http')) {
+            audioStoragePath = data['audio_url'];
           }
           
           // Convert Firebase Storage path to download URL if needed
           String? finalCoverUrl = data['cover_url'];
-          if (storagePath != null) {
-            print('🔄 Converting storage path to download URL: $storagePath');
-            finalCoverUrl = await _storageService.getDownloadUrl(storagePath);
+          if (coverStoragePath != null) {
+            print('🔄 Converting cover storage path to download URL: $coverStoragePath');
+            finalCoverUrl = await _storageService.getDownloadUrl(coverStoragePath);
             print('✅ Final Cover URL: ${finalCoverUrl?.substring(0, 50)}...');
+          }
+          
+          String? finalAudioUrl = data['audio_url'];
+          if (audioStoragePath != null) {
+            print('🔄 Converting audio storage path to download URL: $audioStoragePath');
+            finalAudioUrl = await _storageService.getDownloadUrl(audioStoragePath);
+            print('✅ Final Audio URL: ${finalAudioUrl?.substring(0, 50)}...');
           }
           
           final songData = {
             'id': doc.id,
             ...data,
             'cover_url': finalCoverUrl,
+            'audio_url': finalAudioUrl,
           };
           
           final songModel = SongModel.fromJson(songData);

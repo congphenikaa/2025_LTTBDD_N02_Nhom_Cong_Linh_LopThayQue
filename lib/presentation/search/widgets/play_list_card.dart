@@ -1,4 +1,5 @@
 import 'package:app_nghenhac/domain/entities/search/playlist.dart';
+import 'package:app_nghenhac/presentation/playlist/pages/playlist_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
@@ -20,7 +21,15 @@ class PlaylistCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: onTap ?? () {
+        // Navigate to PlaylistDetailPage when playlist is tapped
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PlaylistDetailPage(playlist: playlist),
+          ),
+        );
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         width: isHorizontal ? null : (width ?? 160),

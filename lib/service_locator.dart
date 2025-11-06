@@ -241,8 +241,8 @@ Future<void> initializeDependencies() async {
   );
 
   // Cubits
-  sl.registerFactory<SongPlayerCubit>(
-    () => SongPlayerCubit()
+  sl.registerSingleton<SongPlayerCubit>(
+    SongPlayerCubit()
   );
 
   sl.registerFactory<SearchCubit>(() => SearchCubit(

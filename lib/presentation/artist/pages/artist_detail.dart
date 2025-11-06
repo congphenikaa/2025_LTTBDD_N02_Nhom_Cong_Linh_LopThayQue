@@ -3,9 +3,12 @@ import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/common/widgets/drawer/app_drawer.dart';
 import 'package:app_nghenhac/domain/entities/search/artist.dart';
 import 'package:app_nghenhac/domain/entities/search/album.dart';
-import 'package:app_nghenhac/domain/entities/search/song.dart' as SearchSong;
+import 'package:app_nghenhac/domain/entities/search/song.dart';
 import 'package:app_nghenhac/presentation/artist/bloc/artist_detail_cubit.dart';
 import 'package:app_nghenhac/presentation/artist/bloc/artist_detail_state.dart';
+import 'package:app_nghenhac/presentation/search_song_player/pages/search_song_player.dart';
+import 'package:app_nghenhac/presentation/album/pages/album_detail_page.dart';
+import 'package:app_nghenhac/presentation/album/bloc/album_cubit.dart';
 import 'package:app_nghenhac/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -227,9 +230,15 @@ class ArtistDetailPage extends StatelessWidget {
   Widget _albumCard(BuildContext context, AlbumEntity album) {
     return GestureDetector(
       onTap: () {
-        // TODO: Navigate to album detail page
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Tapped on album: ${album.title}')),
+        // Navigate to album detail page
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BlocProvider(
+              create: (context) => sl<AlbumCubit>()..loadAlbumDetails(album.id),
+              child: AlbumDetailPage(album: album),
+            ),
+          ),
         );
       },
       child: SizedBox(
@@ -285,7 +294,7 @@ class ArtistDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _songsSection(BuildContext context, List<SearchSong.SongEntity> songs) {
+  Widget _songsSection(BuildContext context, List<SongEntity> songs) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -340,16 +349,26 @@ class ArtistDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _songItem(BuildContext context, SearchSong.SongEntity song) {
+  Widget _songItem(BuildContext context, SongEntity song) {
     print('🎵 Building song item: ${song.title}');
     print('🖼️ Song cover URL: ${song.coverUrl}');
     
     return GestureDetector(
       onTap: () {
-        // TODO: Convert SearchSong.SongEntity to PlayerSong.SongEntity
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Tapped on song: ${song.title}')),
-        );
+        try {
+          // Navigate to SearchSongPlayerPages
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SearchSongPlayerPages(songEntity: song),
+            ),
+          );
+        } catch (e) {
+          print('Error navigating to SearchSongPlayerPages: $e');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Không thể mở bài hát: $e')),
+          );
+        }
       },
       child: Row(
         children: [
@@ -363,9 +382,6 @@ class ArtistDetailPage extends StatelessWidget {
                 image: song.coverUrl != null && song.coverUrl!.isNotEmpty
                     ? NetworkImage(song.coverUrl!)
                     : const AssetImage('assets/images/artist.png') as ImageProvider,
-                onError: (error, stackTrace) {
-                  print('🖼️ Error loading song cover: $error');
-                },
               ),
             ),
           ),

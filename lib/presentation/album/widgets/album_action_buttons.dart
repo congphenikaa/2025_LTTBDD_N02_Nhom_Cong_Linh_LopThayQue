@@ -71,7 +71,10 @@ class AlbumActionButtons extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (songs.isNotEmpty) {
-          context.read<AlbumCubit>().playSong(0);
+          context.read<AlbumCubit>().playAll();
+          _showSnackBar(context, 'Bắt đầu phát album "${album.title}"');
+        } else {
+          _showSnackBar(context, 'Album không có bài hát nào');
         }
       },
       child: Container(
@@ -102,8 +105,12 @@ class AlbumActionButtons extends StatelessWidget {
       context,
       icon: Icons.shuffle_rounded,
       onTap: () {
-        // TODO: Implement shuffle play
-        _showSnackBar(context, 'Phát ngẫu nhiên');
+        if (songs.isNotEmpty) {
+          context.read<AlbumCubit>().shufflePlay();
+          _showSnackBar(context, 'Phát ngẫu nhiên album "${album.title}"');
+        } else {
+          _showSnackBar(context, 'Album không có bài hát nào');
+        }
       },
     );
   }
