@@ -2,8 +2,12 @@ import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
 import 'package:app_nghenhac/domain/entities/search/album.dart';
 import 'package:app_nghenhac/domain/usecases/album/get_albums.dart';
+import 'package:app_nghenhac/presentation/album/bloc/album_cubit.dart';
+import 'package:app_nghenhac/presentation/album/pages/album_detail_page.dart';
+import 'package:app_nghenhac/presentation/album/pages/all_albums_page.dart';
 import 'package:app_nghenhac/service_locator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AlbumsList extends StatefulWidget {
   const AlbumsList({super.key});
@@ -43,7 +47,7 @@ class _AlbumsListState extends State<AlbumsList> {
       // Print each album for debugging
       for (int i = 0; i < albums.length; i++) {
         final album = albums[i];
-        print('💿 Album $i: ${album.title} by ${album.artist}');
+        print('💿 Album $i: [ID: ${album.id}] ${album.title} by ${album.artist}');
       }
       
       setState(() {
@@ -104,7 +108,12 @@ class _AlbumsListState extends State<AlbumsList> {
             ),
             TextButton(
               onPressed: () {
-                // Navigate to all albums page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AllAlbumsPage(),
+                  ),
+                );
               },
               child: Text(
                 'Xem tất cả',
@@ -209,10 +218,13 @@ class _AlbumsListState extends State<AlbumsList> {
     
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Album: ${album.title} - ${album.artist}'),
-            duration: Duration(seconds: 2),
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BlocProvider(
+              create: (_) => sl<AlbumCubit>()..loadAlbumDetails(album.id),
+              child: AlbumDetailPage(album: album),
+            ),
           ),
         );
       },

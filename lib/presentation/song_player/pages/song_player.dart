@@ -2,7 +2,6 @@ import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/common/widgets/drawer/app_drawer.dart';
 import 'package:app_nghenhac/common/widgets/favorite_button/favorite_button.dart';
-import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
 import 'package:app_nghenhac/core/constants/app_urls.dart';
 import 'package:app_nghenhac/domain/entities/song/song.dart';
 import 'package:app_nghenhac/presentation/song_player/bloc/song_player_cubit.dart';

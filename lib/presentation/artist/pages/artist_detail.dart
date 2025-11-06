@@ -1,5 +1,6 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
+import 'package:app_nghenhac/common/widgets/drawer/app_drawer.dart';
 import 'package:app_nghenhac/domain/entities/search/artist.dart';
 import 'package:app_nghenhac/domain/entities/search/album.dart';
 import 'package:app_nghenhac/domain/entities/search/song.dart' as SearchSong;
@@ -20,7 +21,18 @@ class ArtistDetailPage extends StatelessWidget {
       appBar: BasicAppbar(
         backgroundColor: context.isDarkMode ? const Color(0xff2C2B2B) : Colors.white,
         title: Text(artist.name),
+        action: Builder(
+          builder: (context) => IconButton(
+            onPressed: () {
+              Scaffold.of(context).openEndDrawer();
+            }, 
+            icon: const Icon(
+              Icons.menu
+            )
+          ),
+        ),
       ),
+      endDrawer: const AppDrawer(),
       body: BlocProvider(
         create: (context) => sl<ArtistDetailCubit>()..loadArtistDetail(artist.id),
         child: BlocBuilder<ArtistDetailCubit, ArtistDetailState>(

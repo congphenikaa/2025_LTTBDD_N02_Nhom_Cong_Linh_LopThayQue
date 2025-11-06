@@ -40,4 +40,25 @@ class AlbumRepositoryImpl implements AlbumRepository {
       return [];
     }
   }
+
+  @override
+  Future<AlbumEntity?> getAlbumById(String albumId) async {
+    try {
+      print('🔍 AlbumRepository: Calling AlbumFirebaseService to get album with ID: $albumId');
+      
+      final album = await _albumFirebaseService.getAlbumById(albumId);
+      
+      if (album != null) {
+        print('✅ AlbumRepository: Found album: ${album.title}');
+      } else {
+        print('❌ AlbumRepository: Album not found with ID: $albumId');
+      }
+      
+      return album;
+      
+    } catch (e) {
+      print('💥 AlbumRepository: Error in getAlbumById: $e');
+      return null;
+    }
+  }
 }

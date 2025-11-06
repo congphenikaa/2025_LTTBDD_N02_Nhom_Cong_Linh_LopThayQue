@@ -27,6 +27,8 @@ import 'package:app_nghenhac/domain/usecases/song/get_news_songs.dart';
 import 'package:app_nghenhac/domain/usecases/song/get_play_list.dart';
 import 'package:app_nghenhac/domain/usecases/song/is_favorite_song.dart';
 import 'package:app_nghenhac/domain/usecases/album/get_albums.dart';
+import 'package:app_nghenhac/domain/usecases/album/get_album_details.dart';
+import 'package:app_nghenhac/domain/usecases/album/get_songs_by_album.dart';
 import 'package:app_nghenhac/domain/usecases/playlist/get_playlists.dart';
 import 'package:app_nghenhac/domain/usecases/artist/get_artists.dart';
 import 'package:app_nghenhac/domain/usecases/artist/get_artist_details.dart';
@@ -43,6 +45,7 @@ import 'package:app_nghenhac/presentation/search/bloc/search_cubit.dart';
 import 'package:app_nghenhac/presentation/song_player/bloc/song_player_cubit.dart';
 import 'package:app_nghenhac/presentation/home/bloc/artists_cubit.dart';
 import 'package:app_nghenhac/presentation/artist/bloc/artist_detail_cubit.dart';
+import 'package:app_nghenhac/presentation/album/bloc/album_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
@@ -187,6 +190,14 @@ Future<void> initializeDependencies() async {
     GetAlbumsUseCase(repository: sl<AlbumRepository>())
   );
 
+  sl.registerSingleton<GetAlbumDetailsUseCase>(
+    GetAlbumDetailsUseCase(repository: sl<AlbumRepository>())
+  );
+
+  sl.registerSingleton<GetSongsByAlbumUseCase>(
+    GetSongsByAlbumUseCase(repository: sl<SongsRepository>())
+  );
+
   sl.registerSingleton<GetPlaylistsUseCase>(
     GetPlaylistsUseCase(repository: sl<PlaylistRepository>())
   );
@@ -250,6 +261,13 @@ Future<void> initializeDependencies() async {
       getArtistDetailsUseCase: sl<GetArtistDetailsUseCase>(),
       getArtistAlbumsUseCase: sl<GetArtistAlbumsUseCase>(),
       getArtistSongsUseCase: sl<GetArtistSongsUseCase>(),
+    )
+  );
+
+  sl.registerFactory<AlbumCubit>(
+    () => AlbumCubit(
+      getAlbumDetailsUseCase: sl<GetAlbumDetailsUseCase>(),
+      getSongsByAlbumUseCase: sl<GetSongsByAlbumUseCase>(),
     )
   );
 }

@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 abstract class AlbumFirebaseService {
   Future<List<AlbumEntity>> getAlbums({int limit = 20});
   Future<List<AlbumEntity>> getAlbumsByArtist(String artistId);
+  Future<AlbumEntity?> getAlbumById(String albumId);
 }
 
 class AlbumFirebaseServiceImpl implements AlbumFirebaseService {
@@ -157,6 +158,62 @@ class AlbumFirebaseServiceImpl implements AlbumFirebaseService {
     } catch (e) {
       print('💥 AlbumFirebaseService: Error fetching albums for artist: $e');
       return [];
+    }
+  }
+
+  @override
+  Future<AlbumEntity?> getAlbumById(String albumId) async {
+    try {
+      print('🔍 AlbumFirebaseService: Fetching album with ID: $albumId');
+      
+      // Get document by ID
+      final docSnapshot = await _firestore
+          .collection('albums')
+          .doc(albumId)
+          .get();
+
+      if (!docSnapshot.exists) {
+        print('❌ AlbumFirebaseService: Album not found with ID: $albumId');
+        return null;
+      }
+
+      final data = docSnapshot.data()!;
+      print('💿 Processing album: ${data['title'] ?? 'Unknown'}');
+      
+      // Determine which field contains the storage path
+      String? storagePath;
+      if (data['cover_storage_path'] != null && data['cover_storage_path'].toString().isNotEmpty) {
+        storagePath = data['cover_storage_path'];
+      } else if (data['cover_url'] != null && 
+                 data['cover_url'].toString().isNotEmpty && 
+                 !data['cover_url'].toString().startsWith('http') && 
+                 !data['cover_url'].toString().startsWith('https')) {
+        storagePath = data['cover_url'];
+      }
+      
+      // Convert Firebase Storage path to download URL if needed
+      String? finalCoverUrl = data['cover_url'];
+      if (storagePath != null) {
+        print('🔄 Converting storage path to download URL: $storagePath');
+        finalCoverUrl = await _storageService.getDownloadUrl(storagePath);
+        print('✅ Final Cover URL: ${finalCoverUrl?.substring(0, 50)}...');
+      }
+      
+      final albumData = {
+        'id': docSnapshot.id,
+        ...data,
+        'cover_url': finalCoverUrl,
+      };
+      
+      final albumModel = AlbumModel.fromJson(albumData);
+      final albumEntity = albumModel.toEntity();
+      
+      print('✅ AlbumFirebaseService: Successfully loaded album: ${albumEntity.title}');
+      return albumEntity;
+      
+    } catch (e) {
+      print('💥 AlbumFirebaseService: Error fetching album by ID: $e');
+      return null;
     }
   }
 }

@@ -1,4 +1,5 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
+import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
 import 'package:app_nghenhac/domain/entities/search/artist.dart';
 import 'package:app_nghenhac/presentation/home/bloc/artists_cubit.dart';
 import 'package:app_nghenhac/presentation/home/bloc/artists_state.dart';
@@ -37,10 +38,14 @@ class _ArtistsContent extends StatelessWidget {
         child: BlocBuilder<ArtistsCubit, ArtistsState>(
           builder: (context, state) {
             if (state is ArtistsLoading) {
-              return const SizedBox(
+              return SizedBox(
                 height: 150,
                 child: Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      context.isDarkMode ? AppColors.primary : AppColors.primary,
+                    ),
+                  ),
                 ),
               );
             }
@@ -55,13 +60,13 @@ class _ArtistsContent extends StatelessWidget {
                       Icon(
                         Icons.error_outline,
                         size: 48,
-                        color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                        color: context.isDarkMode ? Colors.grey[300] : Colors.grey[700],
                       ),
                       const SizedBox(height: 16),
                       Text(
                         'Không thể tải danh sách nghệ sĩ',
                         style: TextStyle(
-                          color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                          color: context.isDarkMode ? Colors.grey[300] : Colors.grey[700],
                           fontSize: 16,
                         ),
                       ),
@@ -88,7 +93,7 @@ class _ArtistsContent extends StatelessWidget {
                     child: Text(
                       'Không có nghệ sĩ nào',
                       style: TextStyle(
-                        color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                        color: context.isDarkMode ? Colors.grey[300] : Colors.grey[700],
                         fontSize: 16,
                       ),
                     ),
@@ -154,7 +159,9 @@ class _ArtistsContent extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: context.isDarkMode 
+                        ? Colors.black.withOpacity(0.3)
+                        : Colors.black.withOpacity(0.1),
                     blurRadius: isDesktop ? 12 : 8,
                     offset: const Offset(0, 4),
                   ),
@@ -180,7 +187,7 @@ class _ArtistsContent extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.w400,
                   fontSize: isDesktop ? 13 : (isTablet ? 12 : 12),
-                  color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  color: context.isDarkMode ? Colors.grey[300] : Colors.grey[600],
                 ),
                 textAlign: TextAlign.center,
               ),
