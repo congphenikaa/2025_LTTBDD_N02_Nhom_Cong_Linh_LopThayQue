@@ -821,5 +821,47 @@ class LanguageService {
       'en': 'Cannot load albums',
     },
     
+    // About Page
+    'About App': {
+      'vi': 'Giới thiệu ứng dụng',
+      'en': 'About App',
+    },
+    'Music App': {
+      'vi': 'Ứng dụng âm nhạc',
+      'en': 'Music App',
+    },
+    'App Description': {
+      'vi': 'Ứng dụng âm nhạc được phát triển bởi hai sinh viên năm cuối Trường Công Nghệ Thông Tin – Đại học Phenikaa.\n\nỨng dụng mang đến trải nghiệm nghe nhạc trực tuyến tiện lợi, giao diện đẹp và dễ sử dụng.',
+      'en': 'Music App developed by two final-year students from School of Information Technology – Phenikaa University.\n\nThe app provides a convenient online music listening experience with beautiful and user-friendly interface.',
+    },
+    'Development Team': {
+      'vi': 'Đội ngũ phát triển',
+      'en': 'Development Team',
+    },
+    'Main Developer & Logic Handler': {
+      'vi': 'Chính chịu trách nhiệm phát triển app và xử lý logic',
+      'en': 'Main Developer & Logic Handler',
+    },
+    'UI Designer & Feature Developer': {
+      'vi': 'Thiết kế giao diện và hỗ trợ phát triển chức năng',
+      'en': 'UI Designer & Feature Developer',
+    },
+    'Contact Music App': {
+      'vi': 'Liên hệ Music App',
+      'en': 'Contact Music App',
+    },
+    'Send Email': {
+      'vi': 'Gửi email',
+      'en': 'Send Email',
+    },
+    'Phenikaa University': {
+      'vi': 'Đại học Phenikaa',
+      'en': 'Phenikaa University',
+    },
+    'School of Information Technology': {
+      'vi': 'Trường Công Nghệ Thông Tin',
+      'en': 'School of Information Technology',
+    },
+    
   };
 }

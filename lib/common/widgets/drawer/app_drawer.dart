@@ -9,6 +9,7 @@ import 'package:app_nghenhac/service_locator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:app_nghenhac/presentation/about/pages/about_page.dart';
 
 class AppDrawer extends StatefulWidget {
   const AppDrawer({super.key});
@@ -61,21 +62,16 @@ class _AppDrawerState extends State<AppDrawer> {
   Widget build(BuildContext context) {
     final currentUser = FirebaseAuth.instance.currentUser;
     final googleSignInService = sl<GoogleSignInService>();
-    
+
     return Drawer(
       child: Column(
         children: [
           // Header với thông tin user
           UserAccountsDrawerHeader(
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-            ),
+            decoration: BoxDecoration(color: AppColors.primary),
             accountName: Text(
               currentUser?.displayName ?? 'User',
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             accountEmail: Text(
               currentUser?.email ?? '',
@@ -87,15 +83,11 @@ class _AppDrawerState extends State<AppDrawer> {
                   ? NetworkImage(currentUser!.photoURL!)
                   : null,
               child: currentUser?.photoURL == null
-                  ? Icon(
-                      Icons.person,
-                      size: 40,
-                      color: AppColors.primary,
-                    )
+                  ? Icon(Icons.person, size: 40, color: AppColors.primary)
                   : null,
             ),
           ),
-          
+
           // Dark Mode Toggle
           BlocBuilder<ThemeCubit, ThemeMode>(
             builder: (context, state) {
@@ -106,7 +98,10 @@ class _AppDrawerState extends State<AppDrawer> {
                   color: isDark ? Colors.yellow : Colors.orange,
                 ),
                 title: Text(
-                  LanguageService.getTextSync(isDark ? 'dark_mode' : 'light_mode', _currentLanguage),
+                  LanguageService.getTextSync(
+                    isDark ? 'dark_mode' : 'light_mode',
+                    _currentLanguage,
+                  ),
                   style: const TextStyle(fontSize: 16),
                 ),
                 trailing: Switch(
@@ -126,9 +121,9 @@ class _AppDrawerState extends State<AppDrawer> {
               );
             },
           ),
-          
+
           const Divider(),
-          
+
           // Profile
           ListTile(
             leading: const Icon(Icons.person_outline),
@@ -141,38 +136,55 @@ class _AppDrawerState extends State<AppDrawer> {
               );
             },
           ),
-          
+
           // Settings
           ListTile(
             leading: const Icon(Icons.settings_outlined),
-            title: Text(LanguageService.getTextSync('settings', _currentLanguage)),
+            title: Text(
+              LanguageService.getTextSync('settings', _currentLanguage),
+            ),
             onTap: () {
               Navigator.pop(context);
               // TODO: Navigate to Settings page
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(LanguageService.getTextSync('settings_developing', _currentLanguage))),
+                SnackBar(
+                  content: Text(
+                    LanguageService.getTextSync(
+                      'settings_developing',
+                      _currentLanguage,
+                    ),
+                  ),
+                ),
               );
             },
           ),
-          
+
           // About
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: Text(LanguageService.getTextSync('about', _currentLanguage)),
             onTap: () {
-              Navigator.pop(context);
-              _showAboutDialog(context);
+              Navigator.pop(context); // đóng Drawer trước
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AboutPage()),
+              );
             },
           ),
-          
+
           // Language Settings
           ListTile(
             leading: const Icon(Icons.language_outlined),
-            title: Text(LanguageService.getTextSync('Language Settings', _currentLanguage)),
+            title: Text(
+              LanguageService.getTextSync(
+                'Language Settings',
+                _currentLanguage,
+              ),
+            ),
             subtitle: Text(
-              _currentLanguage == 'vi' 
-                ? LanguageService.getTextSync('vietnamese', _currentLanguage)
-                : LanguageService.getTextSync('english', _currentLanguage),
+              _currentLanguage == 'vi'
+                  ? LanguageService.getTextSync('vietnamese', _currentLanguage)
+                  : LanguageService.getTextSync('english', _currentLanguage),
               style: TextStyle(
                 fontSize: 12,
                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
@@ -187,7 +199,7 @@ class _AppDrawerState extends State<AppDrawer> {
               // Không cần _loadLanguage() nữa vì đã có listener
             },
           ),
-          
+
           // Help
           ListTile(
             leading: const Icon(Icons.help_outline),
@@ -195,21 +207,25 @@ class _AppDrawerState extends State<AppDrawer> {
             onTap: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(LanguageService.getTextSync('help_developing', _currentLanguage))),
+                SnackBar(
+                  content: Text(
+                    LanguageService.getTextSync(
+                      'help_developing',
+                      _currentLanguage,
+                    ),
+                  ),
+                ),
               );
             },
           ),
-          
+
           const Divider(),
-          
+
           const Spacer(),
-          
+
           // Sign Out
           ListTile(
-            leading: const Icon(
-              Icons.logout,
-              color: Colors.red,
-            ),
+            leading: const Icon(Icons.logout, color: Colors.red),
             title: Text(
               LanguageService.getTextSync('Sign Out', _currentLanguage),
               style: const TextStyle(
@@ -219,7 +235,7 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
             onTap: () => _showSignOutDialog(context, googleSignInService),
           ),
-          
+
           const SizedBox(height: 20),
         ],
       ),
@@ -244,10 +260,15 @@ class _AppDrawerState extends State<AppDrawer> {
                 ),
               ),
               const SizedBox(height: 8),
-              Text('${LanguageService.getTextSync('version', _currentLanguage)}: 1.0.0'),
+              Text(
+                '${LanguageService.getTextSync('version', _currentLanguage)}: 1.0.0',
+              ),
               const SizedBox(height: 8),
               Text(
-                LanguageService.getTextSync('music_streaming_app', _currentLanguage),
+                LanguageService.getTextSync(
+                  'music_streaming_app',
+                  _currentLanguage,
+                ),
               ),
               const SizedBox(height: 16),
               Text(
@@ -259,7 +280,9 @@ class _AppDrawerState extends State<AppDrawer> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(LanguageService.getTextSync('close', _currentLanguage)),
+              child: Text(
+                LanguageService.getTextSync('close', _currentLanguage),
+              ),
             ),
           ],
         );
@@ -268,8 +291,10 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
 
-
-  void _showSignOutDialog(BuildContext context, GoogleSignInService googleSignInService) {
+  void _showSignOutDialog(
+    BuildContext context,
+    GoogleSignInService googleSignInService,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -279,19 +304,21 @@ class _AppDrawerState extends State<AppDrawer> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(LanguageService.getTextSync('cancel', _currentLanguage)),
+              child: Text(
+                LanguageService.getTextSync('cancel', _currentLanguage),
+              ),
             ),
             TextButton(
               onPressed: () async {
                 final navigator = Navigator.of(context);
                 final scaffoldMessenger = ScaffoldMessenger.of(context);
-                
+
                 navigator.pop(); // Close dialog
                 navigator.pop(); // Close drawer
-                
+
                 try {
                   await googleSignInService.signOut();
-                  
+
                   // Navigate to sign in page only if widget is still mounted
                   if (mounted && context.mounted) {
                     navigator.pushAndRemoveUntil(
@@ -302,7 +329,11 @@ class _AppDrawerState extends State<AppDrawer> {
                 } catch (e) {
                   if (mounted && context.mounted) {
                     scaffoldMessenger.showSnackBar(
-                      SnackBar(content: Text('${LanguageService.getTextSync('logout_error', _currentLanguage)}: $e')),
+                      SnackBar(
+                        content: Text(
+                          '${LanguageService.getTextSync('logout_error', _currentLanguage)}: $e',
+                        ),
+                      ),
                     );
                   }
                 }

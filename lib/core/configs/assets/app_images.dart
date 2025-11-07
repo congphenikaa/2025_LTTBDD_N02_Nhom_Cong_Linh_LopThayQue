@@ -8,6 +8,8 @@ class AppImages {
   static const String homeArtist = '${basePath}home_artist.png';
   static const String taylor = '${basePath}taylor.jpg';
 
+  static const String cong = '${basePath}cong.jpg';
+  static const String linh = '${basePath}linh.jpg';
 
 
 
