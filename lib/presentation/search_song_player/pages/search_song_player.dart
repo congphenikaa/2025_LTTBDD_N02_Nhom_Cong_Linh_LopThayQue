@@ -2,6 +2,7 @@ import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/common/widgets/drawer/app_drawer.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/domain/entities/search/song.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -25,10 +26,16 @@ class _SearchSongPlayerPagesState extends State<SearchSongPlayerPages> {
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
   bool _isPlaying = false;
+  String _currentLanguage = 'vi';
 
   @override
   void initState() {
     super.initState();
+    _loadLanguage();
+    
+    // Lắng nghe thay đổi ngôn ngữ từ LanguageService
+    LanguageService.languageNotifier.addListener(_onLanguageChanged);
+    
     _audioPlayer = AudioPlayer();
     _initializePlayer();
   }
@@ -68,30 +75,49 @@ class _SearchSongPlayerPagesState extends State<SearchSongPlayerPages> {
         setState(() {
           _isLoading = false;
           _hasError = true;
-          _errorMessage = 'Không có URL âm thanh';
+          _errorMessage = LanguageService.getTextSync('No audio URL available', _currentLanguage);
         });
       }
     } catch (e) {
       setState(() {
         _isLoading = false;
         _hasError = true;
-        _errorMessage = 'Error loading song: $e';
+        _errorMessage = '${LanguageService.getTextSync('Error loading song', _currentLanguage)}: $e';
       });
     }
   }
 
   @override
   void dispose() {
+    // Hủy listener khi dispose
+    LanguageService.languageNotifier.removeListener(_onLanguageChanged);
     _audioPlayer.dispose();
     super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {
+        _currentLanguage = LanguageService.languageNotifier.value;
+      });
+    }
+  }
+
+  Future<void> _loadLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    if (mounted) {
+      setState(() {
+        _currentLanguage = language;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: BasicAppbar(
-        title: const Text(
-          'Now playing',
+        title: Text(
+          LanguageService.getTextSync('Now Playing', _currentLanguage),
           style: TextStyle(
             fontSize: 18
           ),
@@ -229,7 +255,7 @@ class _SearchSongPlayerPagesState extends State<SearchSongPlayerPages> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Không thể phát nhạc',
+            LanguageService.getTextSync('Cannot play music', _currentLanguage),
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,

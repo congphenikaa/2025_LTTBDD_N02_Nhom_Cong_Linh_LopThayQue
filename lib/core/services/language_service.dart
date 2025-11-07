@@ -863,5 +863,23 @@ class LanguageService {
       'en': 'School of Information Technology',
     },
     
+    // Search Song Player
+    'Now Playing': {
+      'vi': 'Đang phát',
+      'en': 'Now Playing',
+    },
+    'No audio URL available': {
+      'vi': 'Không có URL âm thanh',
+      'en': 'No audio URL available',
+    },
+    'Error loading song': {
+      'vi': 'Lỗi tải bài hát',
+      'en': 'Error loading song',
+    },
+    'Cannot play music': {
+      'vi': 'Không thể phát nhạc',
+      'en': 'Cannot play music',
+    },
+    
   };
 }

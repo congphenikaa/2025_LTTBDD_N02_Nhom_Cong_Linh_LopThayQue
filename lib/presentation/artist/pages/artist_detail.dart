@@ -29,10 +29,10 @@ class _ArtistDetailPageState extends State<ArtistDetailPage> {
   @override
   void initState() {
     super.initState();
+    _loadLanguage();
     
     // Lắng nghe thay đổi ngôn ngữ từ LanguageService
     LanguageService.languageNotifier.addListener(_onLanguageChanged);
-    _loadLanguage();
   }
 
   @override
@@ -52,9 +52,11 @@ class _ArtistDetailPageState extends State<ArtistDetailPage> {
 
   void _loadLanguage() async {
     final language = await LanguageService.getCurrentLanguage();
-    setState(() {
-      currentLanguage = language;
-    });
+    if (mounted) {
+      setState(() {
+        currentLanguage = language;
+      });
+    }
   }
 
   @override
@@ -340,7 +342,7 @@ class _ArtistDetailPageState extends State<ArtistDetailPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '${LanguageService.getTextSync("Songs", currentLanguage).toUpperCase()} (${songs.length})',
+            '${LanguageService.getTextSync("songs", currentLanguage).toUpperCase()} (${songs.length})',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
