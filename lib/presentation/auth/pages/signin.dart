@@ -2,6 +2,7 @@ import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/common/widgets/button/basic_app_button.dart';
 import 'package:app_nghenhac/core/configs/assets/app_vectors.dart';
 import 'package:app_nghenhac/core/services/google_sign_in_service.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/data/models/auth/signin_user_req.dart';
 import 'package:app_nghenhac/domain/usecases/auth/signin.dart';
 import 'package:app_nghenhac/presentation/auth/pages/signup.dart';
@@ -23,6 +24,22 @@ class _SigninPageState extends State<SigninPage> {
   final GoogleSignInService _googleSignInService = sl<GoogleSignInService>();
   bool _obscurePassword = true;
   bool _isGoogleLoading = false;
+  String _currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLanguage();
+  }
+
+  Future<void> _loadLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    if (mounted) {
+      setState(() {
+        _currentLanguage = language;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +88,7 @@ class _SigninPageState extends State<SigninPage> {
                     }
                   );
                 }, 
-                title: 'Sign In'
+                title: LanguageService.getTextSync('Sign In', _currentLanguage)
               ),
               SizedBox(height: 20,),
               _orDivider(),
@@ -84,9 +101,9 @@ class _SigninPageState extends State<SigninPage> {
   }
 
   Widget _registerText() {
-    return const Text(
-      'Sign In',
-      style: TextStyle(
+    return Text(
+      LanguageService.getTextSync('Sign In', _currentLanguage),
+      style: const TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 25,
       ),
@@ -96,8 +113,8 @@ class _SigninPageState extends State<SigninPage> {
   Widget _emailField(BuildContext context) {
     return TextField(
       controller: _email,
-      decoration: const InputDecoration(
-        hintText: 'Enter Email'
+      decoration: InputDecoration(
+        hintText: LanguageService.getTextSync('Enter Email', _currentLanguage)
       ).applyDefaults(
         Theme.of(context).inputDecorationTheme
       ),
@@ -107,9 +124,9 @@ class _SigninPageState extends State<SigninPage> {
   Widget _passwordField(BuildContext context) {
     return TextField(
       controller: _password,
-      obscureText: _obscurePassword, // Thêm dòng này
+      obscureText: _obscurePassword, // Add this line
       decoration: InputDecoration(
-        hintText: 'Password',
+        hintText: LanguageService.getTextSync('Password', _currentLanguage),
         suffixIcon: IconButton(
           icon: Icon(
             _obscurePassword ? Icons.visibility : Icons.visibility_off,
@@ -138,7 +155,7 @@ class _SigninPageState extends State<SigninPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            'OR',
+            LanguageService.getTextSync('OR', _currentLanguage),
             style: TextStyle(
               color: Colors.grey[600],
               fontWeight: FontWeight.w500,
@@ -173,7 +190,9 @@ class _SigninPageState extends State<SigninPage> {
                 width: 20,
               ),
         label: Text(
-          _isGoogleLoading ? 'Đang đăng nhập...' : 'Đăng nhập với Google',
+          _isGoogleLoading 
+            ? LanguageService.getTextSync('Signing in...', _currentLanguage)
+            : LanguageService.getTextSync('Sign in with Google', _currentLanguage),
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
@@ -195,17 +214,17 @@ class _SigninPageState extends State<SigninPage> {
     try {
       final userCredential = await _googleSignInService.signInWithGoogle();
       if (userCredential != null) {
-        // Đăng nhập thành công, chuyển về trang chính
+        // Sign in successful, navigate to home page
         Navigator.pushAndRemoveUntil(
           context, 
           MaterialPageRoute(builder: (BuildContext context) => HomePage()), 
           (route) => false
         );
       } else {
-        // Người dùng hủy đăng nhập
+        // User cancelled sign in
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Đăng nhập bị hủy'), 
+            content: Text(LanguageService.getTextSync('sign_in_cancelled', _currentLanguage)), 
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -213,7 +232,7 @@ class _SigninPageState extends State<SigninPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Lỗi đăng nhập Google: $e'), 
+          content: Text('${LanguageService.getTextSync('google_sign_in_error', _currentLanguage)}: $e'), 
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -234,7 +253,7 @@ class _SigninPageState extends State<SigninPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Not A Member?',
+            LanguageService.getTextSync('not_a_member', _currentLanguage),
             style: TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 14,
@@ -250,7 +269,7 @@ class _SigninPageState extends State<SigninPage> {
               );
             }, 
             child: Text(
-              'Register Now',
+              LanguageService.getTextSync('register_now', _currentLanguage),
               style: TextStyle(
                 color: Colors.blue,
                 fontWeight: FontWeight.bold,

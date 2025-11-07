@@ -149,13 +149,13 @@ class _SearchPageState extends State<SearchPage> {
         Future.delayed(const Duration(milliseconds: 500), () {
           if (!mounted) return;
           if (_searchController.text == value) {
-            _searchCubit.search(value); // ✅ Dùng CÙNG instance
-            _searchCubit.saveSearchQuery(value.trim()); // ✅ Dùng CÙNG instance
+            _searchCubit.search(value); // ✅ Use SAME instance
+            _searchCubit.saveSearchQuery(value.trim()); // ✅ Use SAME instance
           }
         });
       } else {
-        _searchCubit.clearSearch(); // ✅ Dùng CÙNG instance
-        _searchCubit.loadSearchHistory(); // ✅ Dùng CÙNG instance
+        _searchCubit.clearSearch(); // ✅ Use SAME instance
+        _searchCubit.loadSearchHistory(); // ✅ Use SAME instance
       }
     },
     ),

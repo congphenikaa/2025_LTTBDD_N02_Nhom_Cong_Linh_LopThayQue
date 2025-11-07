@@ -1,6 +1,7 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/common/widgets/drawer/app_drawer.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/domain/entities/search/artist.dart';
 import 'package:app_nghenhac/domain/entities/search/album.dart';
 import 'package:app_nghenhac/domain/entities/search/song.dart';
@@ -13,17 +14,37 @@ import 'package:app_nghenhac/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ArtistDetailPage extends StatelessWidget {
+class ArtistDetailPage extends StatefulWidget {
   final ArtistEntity artist;
 
   const ArtistDetailPage({super.key, required this.artist});
+
+  @override
+  State<ArtistDetailPage> createState() => _ArtistDetailPageState();
+}
+
+class _ArtistDetailPageState extends State<ArtistDetailPage> {
+  String currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLanguage();
+  }
+
+  void _loadLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    setState(() {
+      currentLanguage = language;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: BasicAppbar(
         backgroundColor: context.isDarkMode ? const Color(0xff2C2B2B) : Colors.white,
-        title: Text(artist.name),
+        title: Text(widget.artist.name),
         action: Builder(
           builder: (context) => IconButton(
             onPressed: () {
@@ -37,7 +58,7 @@ class ArtistDetailPage extends StatelessWidget {
       ),
       endDrawer: const AppDrawer(),
       body: BlocProvider(
-        create: (context) => sl<ArtistDetailCubit>()..loadArtistDetail(artist.id),
+        create: (context) => sl<ArtistDetailCubit>()..loadArtistDetail(widget.artist.id),
         child: BlocBuilder<ArtistDetailCubit, ArtistDetailState>(
           builder: (context, state) {
             if (state is ArtistDetailLoading) {
@@ -56,7 +77,7 @@ class ArtistDetailPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Không thể tải thông tin nghệ sĩ',
+                      LanguageService.getTextSync('Cannot Load Artists List', currentLanguage),
                       style: TextStyle(
                         color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
                         fontSize: 16,
@@ -65,9 +86,9 @@ class ArtistDetailPage extends StatelessWidget {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        context.read<ArtistDetailCubit>().loadArtistDetail(artist.id);
+                        context.read<ArtistDetailCubit>().loadArtistDetail(widget.artist.id);
                       },
-                      child: const Text('Thử lại'),
+                      child: Text(LanguageService.getTextSync('Try Again', currentLanguage)),
                     ),
                   ],
                 ),
@@ -141,10 +162,10 @@ class ArtistDetailPage extends StatelessWidget {
               fontWeight: FontWeight.bold
             ),
           ),
-          if (artist.followers != null) ...[
+            if (artist.followers != null) ...[
             const SizedBox(height: 10),
             Text(
-              '${_formatFollowers(artist.followers!)} người theo dõi',
+              '${_formatFollowers(artist.followers!)} ${LanguageService.getTextSync("Followers", currentLanguage)}',
               style: TextStyle(
                 fontSize: 16,
                 color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
@@ -177,7 +198,7 @@ class ArtistDetailPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'ALBUMS (${albums.length})',
+            '${LanguageService.getTextSync("Albums", currentLanguage).toUpperCase()} (${albums.length})',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -199,7 +220,7 @@ class ArtistDetailPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Chưa có album nào',
+                      LanguageService.getTextSync('No Albums Found', currentLanguage),
                       style: TextStyle(
                         color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
                         fontSize: 14,
@@ -301,7 +322,7 @@ class ArtistDetailPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'BÀI HÁT (${songs.length})',
+            '${LanguageService.getTextSync("Songs", currentLanguage).toUpperCase()} (${songs.length})',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -323,7 +344,7 @@ class ArtistDetailPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Chưa có bài hát nào',
+                      LanguageService.getTextSync('No songs found', currentLanguage),
                       style: TextStyle(
                         color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
                         fontSize: 14,
@@ -366,7 +387,9 @@ class ArtistDetailPage extends StatelessWidget {
         } catch (e) {
           print('Error navigating to SearchSongPlayerPages: $e');
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Không thể mở bài hát: $e')),
+            SnackBar(content: Text(
+              '${LanguageService.getTextSync("Error loading data", currentLanguage)}: $e'
+            )),
           );
         }
       },

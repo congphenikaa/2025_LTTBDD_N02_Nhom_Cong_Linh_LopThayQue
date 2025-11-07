@@ -75,7 +75,7 @@ class _SearchSongPlayerPagesState extends State<SearchSongPlayerPages> {
       setState(() {
         _isLoading = false;
         _hasError = true;
-        _errorMessage = 'Lỗi khi tải bài hát: $e';
+        _errorMessage = 'Error loading song: $e';
       });
     }
   }

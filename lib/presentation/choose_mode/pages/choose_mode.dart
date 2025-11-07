@@ -4,6 +4,7 @@ import 'package:app_nghenhac/common/widgets/button/basic_app_button.dart';
 import 'package:app_nghenhac/core/configs/assets/app_images.dart';
 import 'package:app_nghenhac/core/configs/assets/app_vectors.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/presentation/auth/pages/signup_or_singnin.dart';
 import 'package:app_nghenhac/presentation/choose_mode/bloc/theme_cubit.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,30 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 
-class ChooseModePage extends StatelessWidget {
+class ChooseModePage extends StatefulWidget {
   const ChooseModePage({super.key});
+
+  @override
+  State<ChooseModePage> createState() => _ChooseModePageState();
+}
+
+class _ChooseModePageState extends State<ChooseModePage> {
+  String _currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLanguage();
+  }
+
+  Future<void> _loadLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    if (mounted) {
+      setState(() {
+        _currentLanguage = language;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +75,8 @@ class ChooseModePage extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  const Text(
-                    'Choose Mode',
+                  Text(
+                    LanguageService.getTextSync('Choose Mode', _currentLanguage),
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -90,7 +113,7 @@ class ChooseModePage extends StatelessWidget {
                           ),
                           SizedBox(height: 15,),
                           Text(
-                            'Dark Mode',
+                            LanguageService.getTextSync('Dark Mode', _currentLanguage),
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               fontSize: 17,
@@ -126,7 +149,7 @@ class ChooseModePage extends StatelessWidget {
                           ),
                           SizedBox(height: 15,),
                           Text(
-                            'Light Mode',
+                            LanguageService.getTextSync('Light Mode', _currentLanguage),
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               fontSize: 17,
@@ -147,7 +170,7 @@ class ChooseModePage extends StatelessWidget {
                         )
                       );
                     }, 
-                    title: 'Continue',
+                    title: LanguageService.getTextSync('Continue', _currentLanguage),
                   )
                 ],
               ),

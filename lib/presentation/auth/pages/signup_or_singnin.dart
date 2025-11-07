@@ -4,13 +4,34 @@ import 'package:app_nghenhac/common/widgets/button/basic_app_button.dart';
 import 'package:app_nghenhac/core/configs/assets/app_images.dart';
 import 'package:app_nghenhac/core/configs/assets/app_vectors.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/presentation/auth/pages/signin.dart';
 import 'package:app_nghenhac/presentation/auth/pages/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class SignupOrSigninPage extends StatelessWidget {
+class SignupOrSigninPage extends StatefulWidget {
   const SignupOrSigninPage({super.key});
+
+  @override
+  State<SignupOrSigninPage> createState() => _SignupOrSigninPageState();
+}
+
+class _SignupOrSigninPageState extends State<SignupOrSigninPage> {
+  String currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLanguage();
+  }
+
+  void _loadLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    setState(() {
+      currentLanguage = language;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,12 +64,12 @@ class SignupOrSigninPage extends StatelessWidget {
                   SvgPicture.asset(AppVectors.logo),
                   SizedBox(height: 55),
                   Text(
-                    'Enjoy Listening to Music',
+                    LanguageService.getTextSync('Enjoy Listening To Music', currentLanguage),
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                   ),
                   SizedBox(height: 21),
-                  const Text(
-                    'Spotify is a proprietary Swedish audio streaming and media services provider',
+                  Text(
+                    LanguageService.getTextSync('Music description', currentLanguage),
                     style: TextStyle(
                       fontWeight: FontWeight.w500,
                       fontSize: 13,
@@ -70,7 +91,7 @@ class SignupOrSigninPage extends StatelessWidget {
                               )
                             );
                           }, 
-                          title: 'Register'
+                          title: LanguageService.getTextSync('Register', currentLanguage)
                         ),
                        ),
                        SizedBox(width: 20,),
@@ -86,7 +107,7 @@ class SignupOrSigninPage extends StatelessWidget {
                             );
                           }, 
                           child: Text(
-                            'Sign In',
+                            LanguageService.getTextSync('Sign In', currentLanguage),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,

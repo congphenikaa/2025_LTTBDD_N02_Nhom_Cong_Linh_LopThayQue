@@ -1,5 +1,6 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/domain/entities/search/album.dart';
 import 'package:app_nghenhac/presentation/album/bloc/album_cubit.dart';
 import 'package:app_nghenhac/presentation/album/bloc/album_state.dart';
@@ -10,13 +11,33 @@ import 'package:app_nghenhac/presentation/album/widgets/album_mini_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AlbumDetailPage extends StatelessWidget {
+class AlbumDetailPage extends StatefulWidget {
   final AlbumEntity album;
 
   const AlbumDetailPage({
     super.key,
     required this.album,
   });
+
+  @override
+  State<AlbumDetailPage> createState() => _AlbumDetailPageState();
+}
+
+class _AlbumDetailPageState extends State<AlbumDetailPage> {
+  String currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentLanguage();
+  }
+
+  Future<void> _loadCurrentLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    setState(() {
+      currentLanguage = language;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +121,7 @@ class AlbumDetailPage extends StatelessWidget {
             ),
           ),
           child: AlbumHeader(
-            album: album,
+            album: widget.album,
             isDesktop: isDesktop,
             isTablet: isTablet,
           ),
@@ -198,7 +219,7 @@ class AlbumDetailPage extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Đang tải thông tin album...',
+                  LanguageService.getTextSync('loading_album_info', currentLanguage),
                   style: TextStyle(
                     fontSize: isDesktop ? 16 : 14,
                     color: context.isDarkMode ? Colors.white70 : Colors.grey[600],
@@ -237,7 +258,7 @@ class AlbumDetailPage extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Đã xảy ra lỗi',
+                    LanguageService.getTextSync('error_occurred', currentLanguage),
                     style: TextStyle(
                       fontSize: isDesktop ? 24 : 20,
                       fontWeight: FontWeight.bold,
@@ -258,10 +279,10 @@ class AlbumDetailPage extends StatelessWidget {
               SizedBox(height: isDesktop ? 32 : 24),
               ElevatedButton.icon(
                 onPressed: () {
-                  context.read<AlbumCubit>().loadAlbumDetails(album.id);
+                  context.read<AlbumCubit>().loadAlbumDetails(widget.album.id);
                 },
                 icon: const Icon(Icons.refresh_rounded, size: 20),
-                label: const Text('Thử lại'),
+                label: Text(LanguageService.getTextSync('try_again', currentLanguage)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
@@ -309,7 +330,7 @@ class AlbumDetailPage extends StatelessWidget {
                 color: context.isDarkMode ? Colors.white : Colors.black87,
               ),
               title: Text(
-                'Thêm vào yêu thích',
+                LanguageService.getTextSync('add_to_favorite', currentLanguage),
                 style: TextStyle(
                   color: context.isDarkMode ? Colors.white : Colors.black87,
                 ),
@@ -325,7 +346,7 @@ class AlbumDetailPage extends StatelessWidget {
                 color: context.isDarkMode ? Colors.white : Colors.black87,
               ),
               title: Text(
-                'Chia sẻ album',
+                LanguageService.getTextSync('share_album', currentLanguage),
                 style: TextStyle(
                   color: context.isDarkMode ? Colors.white : Colors.black87,
                 ),
@@ -341,7 +362,7 @@ class AlbumDetailPage extends StatelessWidget {
                 color: context.isDarkMode ? Colors.white : Colors.black87,
               ),
               title: Text(
-                'Tải xuống',
+                LanguageService.getTextSync('download', currentLanguage),
                 style: TextStyle(
                   color: context.isDarkMode ? Colors.white : Colors.black87,
                 ),
@@ -357,7 +378,7 @@ class AlbumDetailPage extends StatelessWidget {
                 color: context.isDarkMode ? Colors.white : Colors.black87,
               ),
               title: Text(
-                'Thông tin album',
+                LanguageService.getTextSync('album_info', currentLanguage),
                 style: TextStyle(
                   color: context.isDarkMode ? Colors.white : Colors.black87,
                 ),
@@ -377,24 +398,24 @@ class AlbumDetailPage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(album.title),
+        title: Text(widget.album.title),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Nghệ sĩ: ${album.artist}'),
-            if (album.releaseDate != null)
-              Text('Ngày phát hành: ${_formatDate(album.releaseDate!)}'),
-            if (album.trackCount != null)
-              Text('Số bài hát: ${album.trackCount}'),
-            if (album.genres != null && album.genres!.isNotEmpty)
-              Text('Thể loại: ${album.genres!.join(', ')}'),
+            Text('${LanguageService.getTextSync("artist", currentLanguage)}: ${widget.album.artist}'),
+            if (widget.album.releaseDate != null)
+              Text('${LanguageService.getTextSync("release_date", currentLanguage)}: ${_formatDate(widget.album.releaseDate!)}'),
+            if (widget.album.trackCount != null)
+              Text('${LanguageService.getTextSync("track_count", currentLanguage)}: ${widget.album.trackCount}'),
+            if (widget.album.genres != null && widget.album.genres!.isNotEmpty)
+              Text('${LanguageService.getTextSync("genre", currentLanguage)}: ${widget.album.genres!.join(', ')}'),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Đóng'),
+            child: Text(LanguageService.getTextSync('close', currentLanguage)),
           ),
         ],
       ),

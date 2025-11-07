@@ -129,7 +129,7 @@ class SongPlayerPages extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               
-              // Hiển thị thời gian
+              // Display time
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

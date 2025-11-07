@@ -2,6 +2,7 @@ import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/common/widgets/button/basic_app_button.dart';
 import 'package:app_nghenhac/core/configs/assets/app_vectors.dart';
 import 'package:app_nghenhac/core/services/google_sign_in_service.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/data/models/auth/create_user_req.dart';
 import 'package:app_nghenhac/domain/usecases/auth/signup.dart';
 import 'package:app_nghenhac/presentation/auth/pages/signin.dart';
@@ -24,6 +25,22 @@ class _SignupPageState extends State<SignupPage> {
   final GoogleSignInService _googleSignInService = sl<GoogleSignInService>();
   bool _obscurePassword = true;
   bool _isGoogleLoading = false;
+  String _currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLanguage();
+  }
+
+  Future<void> _loadLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    if (mounted) {
+      setState(() {
+        _currentLanguage = language;
+      });
+    }
+  }
 
 
   @override
@@ -76,7 +93,7 @@ class _SignupPageState extends State<SignupPage> {
                     }
                   );
                 }, 
-                title: 'Create Account'
+                title: LanguageService.getTextSync('Create Account', _currentLanguage)
               ),
               SizedBox(height: 20,),
               _orDivider(),
@@ -89,8 +106,8 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   Widget _registerText() {
-    return const Text(
-      'Register',
+    return Text(
+      LanguageService.getTextSync('Register', _currentLanguage),
       style: TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 25,
@@ -101,8 +118,8 @@ class _SignupPageState extends State<SignupPage> {
   Widget _fullNameField(BuildContext context) {
     return TextField(
       controller: _fullName,
-      decoration: const InputDecoration(
-        hintText: 'Full Name'
+      decoration: InputDecoration(
+        hintText: LanguageService.getTextSync('Full Name', _currentLanguage)
       ).applyDefaults(
         Theme.of(context).inputDecorationTheme
       ),
@@ -112,8 +129,8 @@ class _SignupPageState extends State<SignupPage> {
   Widget _emailField(BuildContext context) {
     return TextField(
       controller: _email,
-      decoration: const InputDecoration(
-        hintText: 'Enter Email'
+      decoration: InputDecoration(
+        hintText: LanguageService.getTextSync('Enter Email', _currentLanguage)
       ).applyDefaults(
         Theme.of(context).inputDecorationTheme
       ),
@@ -123,9 +140,9 @@ class _SignupPageState extends State<SignupPage> {
   Widget _passwordField(BuildContext context) {
     return TextField(
       controller: _password,
-      obscureText: _obscurePassword, // Thêm dòng này
+      obscureText: _obscurePassword,
       decoration: InputDecoration(
-        hintText: 'Password',
+        hintText: LanguageService.getTextSync('Password', _currentLanguage),
         suffixIcon: IconButton(
           icon: Icon(
             _obscurePassword ? Icons.visibility : Icons.visibility_off,
@@ -155,7 +172,7 @@ class _SignupPageState extends State<SignupPage> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
-            'OR',
+            LanguageService.getTextSync('OR', _currentLanguage),
             style: TextStyle(
               color: Colors.grey[600],
               fontWeight: FontWeight.w500,
@@ -190,7 +207,9 @@ class _SignupPageState extends State<SignupPage> {
                 width: 20,
               ),
         label: Text(
-          _isGoogleLoading ? 'Đang đăng nhập...' : 'Đăng ký với Google',
+          _isGoogleLoading 
+            ? LanguageService.getTextSync('Signing in...', _currentLanguage) 
+            : LanguageService.getTextSync('Sign up with Google', _currentLanguage),
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
@@ -212,17 +231,17 @@ class _SignupPageState extends State<SignupPage> {
     try {
       final userCredential = await _googleSignInService.signInWithGoogle();
       if (userCredential != null) {
-        // Đăng nhập thành công, chuyển về trang chính
+        // Login successful, navigate to main page
         Navigator.pushAndRemoveUntil(
           context, 
           MaterialPageRoute(builder: (BuildContext context) => HomePage()), 
           (route) => false
         );
       } else {
-        // Người dùng hủy đăng nhập
+        // User canceled login
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Đăng nhập bị hủy'), 
+            content: Text(LanguageService.getTextSync('Login cancelled', _currentLanguage)), 
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -230,7 +249,7 @@ class _SignupPageState extends State<SignupPage> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Lỗi đăng nhập Google: $e'), 
+          content: Text('${LanguageService.getTextSync('google_login_error', _currentLanguage)}: $e'), 
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -250,7 +269,7 @@ class _SignupPageState extends State<SignupPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Do you have an account?',
+            LanguageService.getTextSync('do_you_have_account', _currentLanguage),
             style: TextStyle(
               fontWeight: FontWeight.w500,
               fontSize: 14,
@@ -265,8 +284,8 @@ class _SignupPageState extends State<SignupPage> {
                 )
               );
             }, 
-            child: const Text(
-              'Sign In',
+            child: Text(
+              LanguageService.getTextSync('sign_in', _currentLanguage),
               style: TextStyle(
                 color: Colors.blue,
                 fontWeight: FontWeight.bold,

@@ -1,9 +1,10 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/domain/entities/search/album.dart';
 import 'package:flutter/material.dart';
 
-class AlbumHeader extends StatelessWidget {
+class AlbumHeader extends StatefulWidget {
   final AlbumEntity album;
   final bool isDesktop;
   final bool isTablet;
@@ -16,6 +17,26 @@ class AlbumHeader extends StatelessWidget {
   });
 
   @override
+  State<AlbumHeader> createState() => _AlbumHeaderState();
+}
+
+class _AlbumHeaderState extends State<AlbumHeader> {
+  String currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentLanguage();
+  }
+
+  Future<void> _loadCurrentLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    setState(() {
+      currentLanguage = language;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final maxHeight = screenHeight * 0.4; // Giới hạn 40% chiều cao màn hình
@@ -23,13 +44,13 @@ class AlbumHeader extends StatelessWidget {
     return Container(
       constraints: BoxConstraints(
         maxHeight: maxHeight,
-        minHeight: isDesktop ? 300 : (isTablet ? 250 : 200),
+        minHeight: widget.isDesktop ? 300 : (widget.isTablet ? 250 : 200),
       ),
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 32 : (isTablet ? 24 : 16),
-        vertical: isDesktop ? 40 : (isTablet ? 32 : 24),
+        horizontal: widget.isDesktop ? 32 : (widget.isTablet ? 24 : 16),
+        vertical: widget.isDesktop ? 40 : (widget.isTablet ? 32 : 24),
       ),
-      child: isDesktop ? _buildDesktopLayout(context) : _buildMobileLayout(context),
+      child: widget.isDesktop ? _buildDesktopLayout(context) : _buildMobileLayout(context),
     );
   }
 
@@ -52,7 +73,7 @@ class AlbumHeader extends StatelessWidget {
   }
 
   Widget _buildMobileLayout(BuildContext context) {
-    final albumCoverSize = isTablet ? 180.0 : 140.0;
+    final albumCoverSize = widget.isTablet ? 180.0 : 140.0;
     
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -62,14 +83,14 @@ class AlbumHeader extends StatelessWidget {
           flex: 3,
           child: _buildAlbumCover(size: albumCoverSize),
         ),
-        SizedBox(height: isTablet ? 16 : 12),
+        SizedBox(height: widget.isTablet ? 16 : 12),
         Flexible(
           flex: 2,
           child: _buildAlbumInfo(
             context,
-            titleSize: isTablet ? 24 : 20,
-            artistSize: isTablet ? 16 : 14,
-            detailsSize: isTablet ? 12 : 10,
+            titleSize: widget.isTablet ? 24 : 20,
+            artistSize: widget.isTablet ? 16 : 14,
+            detailsSize: widget.isTablet ? 12 : 10,
           ),
         ),
       ],
@@ -78,12 +99,12 @@ class AlbumHeader extends StatelessWidget {
 
   Widget _buildAlbumCover({required double size}) {
     return Hero(
-      tag: 'album_cover_${album.id}',
+      tag: 'album_cover_${widget.album.id}',
       child: Container(
         width: size,
         height: size,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(isDesktop ? 16 : 12),
+          borderRadius: BorderRadius.circular(widget.isDesktop ? 16 : 12),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.3),
@@ -93,10 +114,10 @@ class AlbumHeader extends StatelessWidget {
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(isDesktop ? 16 : 12),
-          child: album.coverUrl != null
+          borderRadius: BorderRadius.circular(widget.isDesktop ? 16 : 12),
+          child: widget.album.coverUrl != null
               ? Image.network(
-                  album.coverUrl!,
+                  widget.album.coverUrl!,
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return _buildDefaultCover(size);
@@ -138,7 +159,7 @@ class AlbumHeader extends StatelessWidget {
   }) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: isDesktop ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+      crossAxisAlignment: widget.isDesktop ? CrossAxisAlignment.start : CrossAxisAlignment.center,
       children: [
         // Album Type Label
         Container(
@@ -156,7 +177,7 @@ class AlbumHeader extends StatelessWidget {
             ),
           ),
           child: Text(
-            'ALBUM',
+            LanguageService.getTextSync('ALBUM', currentLanguage).toUpperCase(),
             style: TextStyle(
               fontSize: detailsSize - 1,
               fontWeight: FontWeight.bold,
@@ -165,11 +186,11 @@ class AlbumHeader extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(height: isDesktop ? 12 : 6),
+        SizedBox(height: widget.isDesktop ? 12 : 6),
         
         // Album Title
         Text(
-          album.title,
+          widget.album.title,
           style: TextStyle(
             fontSize: titleSize,
             fontWeight: FontWeight.bold,
@@ -183,11 +204,11 @@ class AlbumHeader extends StatelessWidget {
               ),
             ],
           ),
-          textAlign: isDesktop ? TextAlign.left : TextAlign.center,
+          textAlign: widget.isDesktop ? TextAlign.left : TextAlign.center,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),
-        SizedBox(height: isDesktop ? 8 : 4),
+        SizedBox(height: widget.isDesktop ? 8 : 4),
         
         // Artist Name
         GestureDetector(
@@ -204,7 +225,7 @@ class AlbumHeader extends StatelessWidget {
                   : Colors.black.withOpacity(0.05),
             ),
             child: Text(
-              album.artist,
+              widget.album.artist,
               style: TextStyle(
                 fontSize: artistSize,
                 fontWeight: FontWeight.w600,
@@ -217,13 +238,13 @@ class AlbumHeader extends StatelessWidget {
                     : Colors.black54,
                 decorationThickness: 1,
               ),
-              textAlign: isDesktop ? TextAlign.left : TextAlign.center,
+              textAlign: widget.isDesktop ? TextAlign.left : TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
           ),
         ),
-        SizedBox(height: isDesktop ? 12 : 6),
+        SizedBox(height: widget.isDesktop ? 12 : 6),
         
         // Album Details
         _buildAlbumDetails(context, detailsSize),
@@ -234,16 +255,16 @@ class AlbumHeader extends StatelessWidget {
   Widget _buildAlbumDetails(BuildContext context, double fontSize) {
     final details = <String>[];
     
-    if (album.releaseDate != null) {
-      details.add(_formatYear(album.releaseDate!));
+    if (widget.album.releaseDate != null) {
+      details.add(_formatYear(widget.album.releaseDate!));
     }
     
-    if (album.trackCount != null) {
-      details.add('${album.trackCount} bài hát');
+    if (widget.album.trackCount != null) {
+      details.add('${widget.album.trackCount} ${LanguageService.getTextSync("songs", currentLanguage)}');
     }
     
-    if (album.genres != null && album.genres!.isNotEmpty) {
-      details.add(album.genres!.first);
+    if (widget.album.genres != null && widget.album.genres!.isNotEmpty) {
+      details.add(widget.album.genres!.first);
     }
 
     if (details.isEmpty) {
@@ -266,7 +287,7 @@ class AlbumHeader extends StatelessWidget {
           ),
         ),
         child: Wrap(
-          alignment: isDesktop ? WrapAlignment.start : WrapAlignment.center,
+          alignment: widget.isDesktop ? WrapAlignment.start : WrapAlignment.center,
           spacing: 6,
           runSpacing: 4,
           children: details.asMap().entries.map((entry) {
@@ -320,7 +341,8 @@ class AlbumHeader extends StatelessWidget {
   }
 
   IconData _getDetailIcon(String detail) {
-    if (detail.contains('bài hát')) {
+    if (detail.contains(LanguageService.getTextSync("songs", 'vi')) || 
+        detail.contains(LanguageService.getTextSync("songs", 'en'))) {
       return Icons.queue_music_rounded;
     } else if (detail.length == 4 && int.tryParse(detail) != null) {
       // Year

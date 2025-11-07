@@ -1,4 +1,5 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:flutter/material.dart';
 
 class VideosList extends StatelessWidget {
@@ -156,13 +157,19 @@ class VideosList extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
             SizedBox(height: isDesktop ? 6 : 4),
-            Text(
-              '${video['views']} views',
-              style: TextStyle(
-                fontWeight: FontWeight.w400,
-                fontSize: isDesktop ? 13 : (isTablet ? 12 : 12),
-                color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
-              ),
+            FutureBuilder<String>(
+              future: LanguageService.getCurrentLanguage(),
+              builder: (context, snapshot) {
+                final currentLang = snapshot.data ?? 'vi';
+                return Text(
+                  '${video['views']} ${LanguageService.getTextSync('views', currentLang)}',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: isDesktop ? 13 : (isTablet ? 12 : 12),
+                    color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  ),
+                );
+              },
             ),
           ],
         ),

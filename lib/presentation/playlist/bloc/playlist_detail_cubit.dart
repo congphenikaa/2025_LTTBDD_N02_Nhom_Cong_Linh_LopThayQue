@@ -18,7 +18,7 @@ class PlaylistDetailCubit extends Cubit<PlaylistDetailState> {
       
     } catch (e) {
       print('💥 PlaylistDetailCubit: Error loading playlist songs: $e');
-      emit(PlaylistDetailFailure(message: 'Không thể tải danh sách bài hát'));
+      emit(PlaylistDetailFailure(message: 'Cannot load song list'));
     }
   }
 }

@@ -115,7 +115,7 @@ class PlaylistDetailPage extends StatelessWidget {
           if (playlist.trackCount != null) ...[
             const SizedBox(height: 10),
             Text(
-              '${playlist.trackCount} bài hát',
+              '${playlist.trackCount} songs',
               style: TextStyle(
                 fontSize: 16,
                 color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
@@ -134,7 +134,7 @@ class PlaylistDetailPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'BÀI HÁT',
+            'SONGS',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
@@ -189,7 +189,7 @@ class PlaylistDetailPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Danh sách phát trống',
+                            'Playlist is empty',
                             style: TextStyle(
                               fontSize: 16,
                               color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
@@ -223,7 +223,7 @@ class PlaylistDetailPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Danh sách phát trống',
+                      'Playlist is empty',
                       style: TextStyle(
                         fontSize: 16,
                         color: context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
@@ -255,7 +255,7 @@ class PlaylistDetailPage extends StatelessWidget {
         } catch (e) {
           print('Error navigating to SearchSongPlayerPages: $e');
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Không thể mở bài hát: $e')),
+            SnackBar(content: Text('Cannot open song: $e')),
           );
         }
       },

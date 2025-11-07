@@ -1,5 +1,6 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/domain/entities/search/playlist.dart';
 import 'package:app_nghenhac/domain/usecases/playlist/get_playlists.dart';
 import 'package:app_nghenhac/presentation/playlist/pages/playlist_detail_page.dart';
@@ -95,13 +96,19 @@ class _PlaylistsListState extends State<PlaylistsList> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Playlists Nổi Bật',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: isDesktop ? 24 : (isTablet ? 20 : 18),
-                color: context.isDarkMode ? Colors.white : Colors.black,
-              ),
+            FutureBuilder<String>(
+              future: LanguageService.getCurrentLanguage(),
+              builder: (context, snapshot) {
+                final currentLang = snapshot.data ?? 'vi';
+                return Text(
+                  LanguageService.getTextSync('Featured Playlists', currentLang),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: isDesktop ? 24 : (isTablet ? 20 : 18),
+                    color: context.isDarkMode ? Colors.white : Colors.black,
+                  ),
+                );
+              },
             ),
             TextButton(
               onPressed: () {

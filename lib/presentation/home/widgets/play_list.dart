@@ -1,6 +1,7 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/common/widgets/favorite_button/favorite_button.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/domain/entities/song/song.dart';
 import 'package:app_nghenhac/presentation/home/bloc/play_list_cubit.dart';
 import 'package:app_nghenhac/presentation/home/bloc/play_list_state.dart';
@@ -34,21 +35,33 @@ class PlayList extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Playlist',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16
-                        ),
+                      FutureBuilder<String>(
+                        future: LanguageService.getCurrentLanguage(),
+                        builder: (context, snapshot) {
+                          final currentLang = snapshot.data ?? 'vi';
+                          return Text(
+                            LanguageService.getTextSync('Playlists', currentLang),
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16
+                            ),
+                          );
+                        },
                       ),
               
-                      Text(
-                        'See More',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 10,
-                          color: const Color(0xffC6C6C6)
-                        ),
+                      FutureBuilder<String>(
+                        future: LanguageService.getCurrentLanguage(),
+                        builder: (context, snapshot) {
+                          final currentLang = snapshot.data ?? 'vi';
+                          return Text(
+                            LanguageService.getTextSync('See More', currentLang),
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 10,
+                              color: const Color(0xffC6C6C6)
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),

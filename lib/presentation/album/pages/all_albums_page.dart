@@ -1,6 +1,7 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/domain/entities/search/album.dart';
 import 'package:app_nghenhac/domain/usecases/album/get_albums.dart';
 import 'package:app_nghenhac/presentation/album/bloc/album_cubit.dart';
@@ -23,12 +24,21 @@ class _AllAlbumsPageState extends State<AllAlbumsPage> {
   final ScrollController _scrollController = ScrollController();
   bool _hasMoreData = true;
   int _currentLimit = 20;
+  String currentLanguage = 'vi';
 
   @override
   void initState() {
     super.initState();
+    _loadCurrentLanguage();
     _loadAlbums();
     _scrollController.addListener(_onScroll);
+  }
+
+  Future<void> _loadCurrentLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    setState(() {
+      currentLanguage = language;
+    });
   }
 
   @override
@@ -100,7 +110,7 @@ class _AllAlbumsPageState extends State<AllAlbumsPage> {
     return Scaffold(
       appBar: BasicAppbar(
         title: Text(
-          'Tất cả Albums',
+          LanguageService.getTextSync('all_albums', currentLanguage),
           style: TextStyle(
             fontSize: isDesktop ? 24 : (isTablet ? 20 : 18),
             fontWeight: FontWeight.bold,
@@ -120,7 +130,7 @@ class _AllAlbumsPageState extends State<AllAlbumsPage> {
             CircularProgressIndicator(color: AppColors.primary),
             SizedBox(height: 16),
             Text(
-              'Đang tải albums...',
+              LanguageService.getTextSync('loading_albums', currentLanguage),
               style: TextStyle(
                 fontSize: isDesktop ? 16 : 14,
                 color: context.isDarkMode ? Colors.white70 : Colors.black54,
@@ -143,7 +153,7 @@ class _AllAlbumsPageState extends State<AllAlbumsPage> {
             ),
             SizedBox(height: 16),
             Text(
-              'Không thể tải albums',
+              LanguageService.getTextSync('cannot_load_albums', currentLanguage),
               style: TextStyle(
                 fontSize: isDesktop ? 20 : 18,
                 fontWeight: FontWeight.bold,
@@ -161,7 +171,7 @@ class _AllAlbumsPageState extends State<AllAlbumsPage> {
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: _loadAlbums,
-              child: const Text('Thử lại'),
+              child: Text(LanguageService.getTextSync('try_again', currentLanguage)),
             ),
           ],
         ),
@@ -180,7 +190,7 @@ class _AllAlbumsPageState extends State<AllAlbumsPage> {
             ),
             SizedBox(height: 16),
             Text(
-              'Không có albums nào',
+              LanguageService.getTextSync('no_albums_found', currentLanguage),
               style: TextStyle(
                 fontSize: isDesktop ? 20 : 18,
                 fontWeight: FontWeight.bold,

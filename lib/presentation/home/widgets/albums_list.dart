@@ -1,5 +1,6 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/domain/entities/search/album.dart';
 import 'package:app_nghenhac/domain/usecases/album/get_albums.dart';
 import 'package:app_nghenhac/presentation/album/bloc/album_cubit.dart';
@@ -20,20 +21,42 @@ class _AlbumsListState extends State<AlbumsList> {
   List<AlbumEntity> _albums = [];
   bool _isLoading = true;
   String? _error;
+  String _currentLanguage = 'vi';
 
   @override
   void initState() {
     super.initState();
+    _loadLanguage();
     _loadAlbums();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Future<void> _loadLanguage() async {
+    try {
+      final language = await LanguageService.getCurrentLanguage();
+      if (mounted) {
+        setState(() {
+          _currentLanguage = language;
+        });
+      }
+    } catch (e) {
+      print('Error loading language: $e');
+    }
   }
 
   Future<void> _loadAlbums() async {
     try {
       print('🔍 AlbumsList: Starting to load albums...');
-      setState(() {
-        _isLoading = true;
-        _error = null;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+          _error = null;
+        });
+      }
 
       final getAlbumsUseCase = sl<GetAlbumsUseCase>();
       print('🔍 AlbumsList: Got GetAlbumsUseCase, calling to fetch albums');
@@ -50,18 +73,22 @@ class _AlbumsListState extends State<AlbumsList> {
         print('💿 Album $i: [ID: ${album.id}] ${album.title} by ${album.artist}');
       }
       
-      setState(() {
-        _albums = albums;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _albums = albums;
+          _isLoading = false;
+        });
+      }
       
       print('🏁 AlbumsList: setState completed. Albums count: ${_albums.length}');
     } catch (e) {
       print('💥 AlbumsList: Exception caught: $e');
-      setState(() {
-        _error = e.toString();
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -99,7 +126,7 @@ class _AlbumsListState extends State<AlbumsList> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Albums Mới Nhất',
+              LanguageService.getTextSync('Albums News', _currentLanguage),
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: isDesktop ? 24 : (isTablet ? 20 : 18),
@@ -116,7 +143,7 @@ class _AlbumsListState extends State<AlbumsList> {
                 );
               },
               child: Text(
-                'Xem tất cả',
+                LanguageService.getTextSync('See More', _currentLanguage),
                 style: TextStyle(
                   fontSize: isDesktop ? 16 : (isTablet ? 14 : 12),
                   color: context.isDarkMode ? Colors.white70 : AppColors.primary,
@@ -156,7 +183,7 @@ class _AlbumsListState extends State<AlbumsList> {
               ),
               SizedBox(height: 8),
               Text(
-                'Không thể tải albums',
+                LanguageService.getTextSync('Cannot load albums', _currentLanguage),
                 style: TextStyle(
                   fontSize: isDesktop ? 16 : 14,
                   color: context.isDarkMode ? Colors.white70 : Colors.black54,
@@ -165,7 +192,7 @@ class _AlbumsListState extends State<AlbumsList> {
               SizedBox(height: 8),
               TextButton(
                 onPressed: _loadAlbums,
-                child: Text('Thử lại'),
+                child: Text(LanguageService.getTextSync('Try Again', _currentLanguage)),
               ),
             ],
           ),
@@ -178,7 +205,7 @@ class _AlbumsListState extends State<AlbumsList> {
         height: isDesktop ? 280 : (isTablet ? 240 : 200),
         child: Center(
           child: Text(
-            'Không có albums nào',
+            LanguageService.getTextSync('No Albums Found', _currentLanguage),
             style: TextStyle(
               fontSize: isDesktop ? 16 : 14,
               color: context.isDarkMode ? Colors.white70 : Colors.black54,
@@ -300,7 +327,7 @@ class _AlbumsListState extends State<AlbumsList> {
             if (album.trackCount != null) ...[
               SizedBox(height: 1), // Reduced spacing
               Text(
-                '${album.trackCount} bài hát',
+                '${album.trackCount} ${LanguageService.getTextSync("songs", _currentLanguage)}',
                 style: TextStyle(
                   fontSize: isDesktop ? 11 : (isTablet ? 10 : 9), // Smaller
                   color: context.isDarkMode ? Colors.white60 : Colors.black45,

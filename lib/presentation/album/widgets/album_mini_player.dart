@@ -1,12 +1,13 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/domain/entities/search/song.dart';
 import 'package:app_nghenhac/presentation/album/bloc/album_cubit.dart';
 import 'package:app_nghenhac/presentation/search_song_player/pages/search_song_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AlbumMiniPlayer extends StatelessWidget {
+class AlbumMiniPlayer extends StatefulWidget {
   final SongEntity currentSong;
   final bool isPlaying;
   final bool isDesktop;
@@ -21,17 +22,37 @@ class AlbumMiniPlayer extends StatelessWidget {
   });
 
   @override
+  State<AlbumMiniPlayer> createState() => _AlbumMiniPlayerState();
+}
+
+class _AlbumMiniPlayerState extends State<AlbumMiniPlayer> {
+  String currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentLanguage();
+  }
+
+  Future<void> _loadCurrentLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    setState(() {
+      currentLanguage = language;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 20 : (isTablet ? 16 : 12),
-        vertical: isDesktop ? 16 : (isTablet ? 12 : 8),
+        horizontal: widget.isDesktop ? 20 : (widget.isTablet ? 16 : 12),
+        vertical: widget.isDesktop ? 16 : (widget.isTablet ? 12 : 8),
       ),
       decoration: BoxDecoration(
         color: context.isDarkMode 
             ? Colors.grey[850]?.withOpacity(0.95) 
             : Colors.grey[50]?.withOpacity(0.95),
-        borderRadius: BorderRadius.circular(isDesktop ? 16 : 12),
+        borderRadius: BorderRadius.circular(widget.isDesktop ? 16 : 12),
         border: Border.all(
           color: AppColors.primary.withOpacity(0.2),
           width: 1,
@@ -50,23 +71,23 @@ class AlbumMiniPlayer extends StatelessWidget {
           GestureDetector(
             onTap: () => _openFullPlayer(context),
             child: Container(
-              width: isDesktop ? 56 : (isTablet ? 48 : 40),
-              height: isDesktop ? 56 : (isTablet ? 48 : 40),
+              width: widget.isDesktop ? 56 : (widget.isTablet ? 48 : 40),
+              height: widget.isDesktop ? 56 : (widget.isTablet ? 48 : 40),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 color: AppColors.primary.withOpacity(0.2),
               ),
-              child: currentSong.coverUrl != null
+              child: widget.currentSong.coverUrl != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: Image.network(
-                        currentSong.coverUrl!,
+                        widget.currentSong.coverUrl!,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Icon(
                             Icons.music_note_rounded,
                             color: AppColors.primary,
-                            size: isDesktop ? 28 : (isTablet ? 24 : 20),
+                            size: widget.isDesktop ? 28 : (widget.isTablet ? 24 : 20),
                           );
                         },
                       ),
@@ -74,12 +95,12 @@ class AlbumMiniPlayer extends StatelessWidget {
                   : Icon(
                       Icons.music_note_rounded,
                       color: AppColors.primary,
-                      size: isDesktop ? 28 : (isTablet ? 24 : 20),
+                      size: widget.isDesktop ? 28 : (widget.isTablet ? 24 : 20),
                     ),
             ),
           ),
           
-          SizedBox(width: isDesktop ? 16 : (isTablet ? 12 : 8)),
+          SizedBox(width: widget.isDesktop ? 16 : (widget.isTablet ? 12 : 8)),
           
           // Song Info
           Expanded(
@@ -94,13 +115,13 @@ class AlbumMiniPlayer extends StatelessWidget {
                       Icon(
                         Icons.graphic_eq_rounded,
                         color: AppColors.primary,
-                        size: isDesktop ? 16 : (isTablet ? 14 : 12),
+                        size: widget.isDesktop ? 16 : (widget.isTablet ? 14 : 12),
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Đang phát',
+                        LanguageService.getTextSync('now_playing', currentLanguage),
                         style: TextStyle(
-                          fontSize: isDesktop ? 12 : (isTablet ? 11 : 10),
+                          fontSize: widget.isDesktop ? 12 : (widget.isTablet ? 11 : 10),
                           color: AppColors.primary,
                           fontWeight: FontWeight.w600,
                         ),
@@ -109,9 +130,9 @@ class AlbumMiniPlayer extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    currentSong.title,
+                    widget.currentSong.title,
                     style: TextStyle(
-                      fontSize: isDesktop ? 16 : (isTablet ? 14 : 12),
+                      fontSize: widget.isDesktop ? 16 : (widget.isTablet ? 14 : 12),
                       fontWeight: FontWeight.w600,
                       color: context.isDarkMode ? Colors.white : Colors.black,
                     ),
@@ -120,9 +141,9 @@ class AlbumMiniPlayer extends StatelessWidget {
                   ),
                   const SizedBox(height: 1),
                   Text(
-                    currentSong.artist,
+                    widget.currentSong.artist,
                     style: TextStyle(
-                      fontSize: isDesktop ? 14 : (isTablet ? 12 : 10),
+                      fontSize: widget.isDesktop ? 14 : (widget.isTablet ? 12 : 10),
                       color: context.isDarkMode ? Colors.white70 : Colors.black54,
                     ),
                     maxLines: 1,
@@ -141,7 +162,7 @@ class AlbumMiniPlayer extends StatelessWidget {
               GestureDetector(
                 onTap: () => context.read<AlbumCubit>().previousSong(),
                 child: Container(
-                  padding: EdgeInsets.all(isDesktop ? 8 : 6),
+                  padding: EdgeInsets.all(widget.isDesktop ? 8 : 6),
                   decoration: BoxDecoration(
                     color: context.isDarkMode 
                         ? Colors.white.withOpacity(0.1)
@@ -151,18 +172,18 @@ class AlbumMiniPlayer extends StatelessWidget {
                   child: Icon(
                     Icons.skip_previous_rounded,
                     color: context.isDarkMode ? Colors.white : Colors.black,
-                    size: isDesktop ? 24 : (isTablet ? 20 : 16),
+                    size: widget.isDesktop ? 24 : (widget.isTablet ? 20 : 16),
                   ),
                 ),
               ),
               
-              SizedBox(width: isDesktop ? 12 : 8),
+              SizedBox(width: widget.isDesktop ? 12 : 8),
               
               // Play/Pause Button
               GestureDetector(
                 onTap: () => context.read<AlbumCubit>().togglePlayPause(),
                 child: Container(
-                  padding: EdgeInsets.all(isDesktop ? 12 : 10),
+                  padding: EdgeInsets.all(widget.isDesktop ? 12 : 10),
                   decoration: BoxDecoration(
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(25),
@@ -175,22 +196,22 @@ class AlbumMiniPlayer extends StatelessWidget {
                     ],
                   ),
                   child: Icon(
-                    isPlaying 
+                    widget.isPlaying 
                         ? Icons.pause_rounded 
                         : Icons.play_arrow_rounded,
                     color: Colors.white,
-                    size: isDesktop ? 28 : (isTablet ? 24 : 20),
+                    size: widget.isDesktop ? 28 : (widget.isTablet ? 24 : 20),
                   ),
                 ),
               ),
               
-              SizedBox(width: isDesktop ? 12 : 8),
+              SizedBox(width: widget.isDesktop ? 12 : 8),
               
               // Next Button
               GestureDetector(
                 onTap: () => context.read<AlbumCubit>().nextSong(),
                 child: Container(
-                  padding: EdgeInsets.all(isDesktop ? 8 : 6),
+                  padding: EdgeInsets.all(widget.isDesktop ? 8 : 6),
                   decoration: BoxDecoration(
                     color: context.isDarkMode 
                         ? Colors.white.withOpacity(0.1)
@@ -200,7 +221,7 @@ class AlbumMiniPlayer extends StatelessWidget {
                   child: Icon(
                     Icons.skip_next_rounded,
                     color: context.isDarkMode ? Colors.white : Colors.black,
-                    size: isDesktop ? 24 : (isTablet ? 20 : 16),
+                    size: widget.isDesktop ? 24 : (widget.isTablet ? 20 : 16),
                   ),
                 ),
               ),
@@ -215,7 +236,7 @@ class AlbumMiniPlayer extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => SearchSongPlayerPages(songEntity: currentSong),
+        builder: (context) => SearchSongPlayerPages(songEntity: widget.currentSong),
       ),
     );
   }

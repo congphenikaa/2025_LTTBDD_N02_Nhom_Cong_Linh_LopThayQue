@@ -1,5 +1,6 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/domain/entities/search/artist.dart';
 import 'package:app_nghenhac/presentation/home/bloc/artists_cubit.dart';
 import 'package:app_nghenhac/presentation/home/bloc/artists_state.dart';
@@ -182,14 +183,20 @@ class _ArtistsContent extends StatelessWidget {
             ),
             SizedBox(height: isDesktop ? 6 : 4),
             if (artist.followers != null)
-              Text(
-                '${_formatFollowers(artist.followers!)} followers',
-                style: TextStyle(
-                  fontWeight: FontWeight.w400,
-                  fontSize: isDesktop ? 13 : (isTablet ? 12 : 12),
-                  color: context.isDarkMode ? Colors.grey[300] : Colors.grey[600],
-                ),
-                textAlign: TextAlign.center,
+              FutureBuilder<String>(
+                future: LanguageService.getCurrentLanguage(),
+                builder: (context, snapshot) {
+                  final currentLang = snapshot.data ?? 'vi';
+                  return Text(
+                    '${_formatFollowers(artist.followers!)} ${LanguageService.getTextSync('Followers', currentLang)}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: isDesktop ? 13 : (isTablet ? 12 : 12),
+                      color: context.isDarkMode ? Colors.grey[300] : Colors.grey[600],
+                    ),
+                    textAlign: TextAlign.center,
+                  );
+                },
               ),
           ],
         ),

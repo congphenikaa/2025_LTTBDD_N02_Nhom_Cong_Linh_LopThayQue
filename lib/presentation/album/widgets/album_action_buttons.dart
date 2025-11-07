@@ -1,12 +1,13 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/domain/entities/search/album.dart';
 import 'package:app_nghenhac/domain/entities/search/song.dart';
 import 'package:app_nghenhac/presentation/album/bloc/album_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AlbumActionButtons extends StatelessWidget {
+class AlbumActionButtons extends StatefulWidget {
   final AlbumEntity album;
   final List<SongEntity> songs;
   final bool isDesktop;
@@ -21,13 +22,33 @@ class AlbumActionButtons extends StatelessWidget {
   });
 
   @override
+  State<AlbumActionButtons> createState() => _AlbumActionButtonsState();
+}
+
+class _AlbumActionButtonsState extends State<AlbumActionButtons> {
+  String currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentLanguage();
+  }
+
+  Future<void> _loadCurrentLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    setState(() {
+      currentLanguage = language;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 32 : (isTablet ? 24 : 16),
-        vertical: isDesktop ? 32 : (isTablet ? 24 : 20),
+        horizontal: widget.isDesktop ? 32 : (widget.isTablet ? 24 : 16),
+        vertical: widget.isDesktop ? 32 : (widget.isTablet ? 24 : 20),
       ),
-      child: isDesktop ? _buildDesktopLayout(context) : _buildMobileLayout(context),
+      child: widget.isDesktop ? _buildDesktopLayout(context) : _buildMobileLayout(context),
     );
   }
 
@@ -52,7 +73,7 @@ class AlbumActionButtons extends StatelessWidget {
       children: [
         Row(
           children: [
-            _buildPlayButton(context, size: isTablet ? 56 : 48),
+            _buildPlayButton(context, size: widget.isTablet ? 56 : 48),
             const SizedBox(width: 16),
             _buildShuffleButton(context),
             const SizedBox(width: 12),
@@ -70,11 +91,11 @@ class AlbumActionButtons extends StatelessWidget {
   Widget _buildPlayButton(BuildContext context, {required double size}) {
     return GestureDetector(
       onTap: () {
-        if (songs.isNotEmpty) {
+        if (widget.songs.isNotEmpty) {
           context.read<AlbumCubit>().playAll();
-          _showSnackBar(context, 'Bắt đầu phát album "${album.title}"');
+          _showSnackBar(context, '${LanguageService.getTextSync("start_playing_album", currentLanguage)} "${widget.album.title}"');
         } else {
-          _showSnackBar(context, 'Album không có bài hát nào');
+          _showSnackBar(context, LanguageService.getTextSync("album_no_songs", currentLanguage));
         }
       },
       child: Container(
@@ -105,11 +126,11 @@ class AlbumActionButtons extends StatelessWidget {
       context,
       icon: Icons.shuffle_rounded,
       onTap: () {
-        if (songs.isNotEmpty) {
+        if (widget.songs.isNotEmpty) {
           context.read<AlbumCubit>().shufflePlay();
-          _showSnackBar(context, 'Phát ngẫu nhiên album "${album.title}"');
+          _showSnackBar(context, '${LanguageService.getTextSync("shuffle_play_album", currentLanguage)} "${widget.album.title}"');
         } else {
-          _showSnackBar(context, 'Album không có bài hát nào');
+          _showSnackBar(context, LanguageService.getTextSync("album_no_songs", currentLanguage));
         }
       },
     );
@@ -118,11 +139,13 @@ class AlbumActionButtons extends StatelessWidget {
   Widget _buildFavoriteButton(BuildContext context) {
     return _buildActionButton(
       context,
-      icon: album.isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-      iconColor: album.isFavorite ? Colors.red[400] : null,
+      icon: widget.album.isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+      iconColor: widget.album.isFavorite ? Colors.red[400] : null,
       onTap: () {
         // TODO: Implement toggle favorite
-        _showSnackBar(context, album.isFavorite ? 'Đã xóa khỏi yêu thích' : 'Đã thêm vào yêu thích');
+        _showSnackBar(context, widget.album.isFavorite 
+          ? LanguageService.getTextSync("removed_from_favorite", currentLanguage) 
+          : LanguageService.getTextSync("added_to_favorite", currentLanguage));
       },
     );
   }
@@ -143,7 +166,7 @@ class AlbumActionButtons extends StatelessWidget {
       icon: Icons.download_rounded,
       onTap: () {
         // TODO: Implement download
-        _showSnackBar(context, 'Đang tải xuống album...');
+        _showSnackBar(context, LanguageService.getTextSync("downloading_album", currentLanguage));
       },
     );
   }
@@ -154,8 +177,8 @@ class AlbumActionButtons extends StatelessWidget {
     required VoidCallback onTap,
     Color? iconColor,
   }) {
-    final buttonSize = isDesktop ? 48.0 : (isTablet ? 44.0 : 40.0);
-    final iconSize = isDesktop ? 24.0 : (isTablet ? 22.0 : 20.0);
+    final buttonSize = widget.isDesktop ? 48.0 : (widget.isTablet ? 44.0 : 40.0);
+    final iconSize = widget.isDesktop ? 24.0 : (widget.isTablet ? 22.0 : 20.0);
 
     return GestureDetector(
       onTap: onTap,
@@ -213,14 +236,14 @@ class AlbumActionButtons extends StatelessWidget {
                 color: context.isDarkMode ? Colors.white : Colors.black87,
               ),
               title: Text(
-                'Thêm vào playlist',
+                LanguageService.getTextSync('add_to_playlist', currentLanguage),
                 style: TextStyle(
                   color: context.isDarkMode ? Colors.white : Colors.black87,
                 ),
               ),
               onTap: () {
                 Navigator.pop(context);
-                _showSnackBar(context, 'Tính năng sẽ được cập nhật');
+                _showSnackBar(context, LanguageService.getTextSync('feature_coming_soon', currentLanguage));
               },
             ),
             ListTile(
@@ -229,14 +252,14 @@ class AlbumActionButtons extends StatelessWidget {
                 color: context.isDarkMode ? Colors.white : Colors.black87,
               ),
               title: Text(
-                'Chia sẻ album',
+                LanguageService.getTextSync('share', currentLanguage),
                 style: TextStyle(
                   color: context.isDarkMode ? Colors.white : Colors.black87,
                 ),
               ),
               onTap: () {
                 Navigator.pop(context);
-                _showSnackBar(context, 'Tính năng sẽ được cập nhật');
+                _showSnackBar(context, LanguageService.getTextSync('feature_coming_soon', currentLanguage));
               },
             ),
             ListTile(
@@ -245,7 +268,7 @@ class AlbumActionButtons extends StatelessWidget {
                 color: context.isDarkMode ? Colors.white : Colors.black87,
               ),
               title: Text(
-                'Thông tin album',
+                LanguageService.getTextSync('album_info', currentLanguage),
                 style: TextStyle(
                   color: context.isDarkMode ? Colors.white : Colors.black87,
                 ),
@@ -281,25 +304,25 @@ class AlbumActionButtons extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(album.title),
+        title: Text(widget.album.title),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildInfoRow('Nghệ sĩ', album.artist),
-            if (album.releaseDate != null)
-              _buildInfoRow('Năm phát hành', album.releaseDate!.year.toString()),
-            if (album.trackCount != null)
-              _buildInfoRow('Số bài hát', album.trackCount.toString()),
-            if (album.genres != null && album.genres!.isNotEmpty)
-              _buildInfoRow('Thể loại', album.genres!.join(', ')),
-            _buildInfoRow('Số bài hát có sẵn', songs.length.toString()),
+            _buildInfoRow(LanguageService.getTextSync("artist", currentLanguage), widget.album.artist),
+            if (widget.album.releaseDate != null)
+              _buildInfoRow(LanguageService.getTextSync("release_year", currentLanguage), widget.album.releaseDate!.year.toString()),
+            if (widget.album.trackCount != null)
+              _buildInfoRow(LanguageService.getTextSync("track_count", currentLanguage), widget.album.trackCount.toString()),
+            if (widget.album.genres != null && widget.album.genres!.isNotEmpty)
+              _buildInfoRow(LanguageService.getTextSync("genre", currentLanguage), widget.album.genres!.join(', ')),
+            _buildInfoRow(LanguageService.getTextSync("available_songs", currentLanguage), widget.songs.length.toString()),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Đóng'),
+            child: Text(LanguageService.getTextSync('close', currentLanguage)),
           ),
         ],
       ),

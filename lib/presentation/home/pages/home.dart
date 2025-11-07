@@ -5,6 +5,7 @@ import 'package:app_nghenhac/common/widgets/drawer/app_drawer.dart';
 import 'package:app_nghenhac/core/configs/assets/app_images.dart';
 import 'package:app_nghenhac/core/configs/assets/app_vectors.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/presentation/home/widgets/news_songs.dart';
 import 'package:app_nghenhac/presentation/home/widgets/play_list.dart';
 import 'package:app_nghenhac/presentation/home/widgets/artists_list.dart';
@@ -15,6 +16,7 @@ import 'package:app_nghenhac/presentation/home/widgets/playlists_list.dart';
 import 'package:app_nghenhac/presentation/profile/pages/profile.dart';
 import 'package:app_nghenhac/presentation/search/bloc/search_cubit.dart';
 import 'package:app_nghenhac/presentation/search/pages/search_page.dart';
+import 'package:app_nghenhac/presentation/language/pages/language_settings_page.dart';
 import 'package:app_nghenhac/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,11 +32,22 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _selectedBottomBarIndex = 0;
+  String _currentLanguage = 'vi';
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
+    _loadLanguage();
+  }
+
+  Future<void> _loadLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    if (mounted) {
+      setState(() {
+        _currentLanguage = language;
+      });
+    }
   }
 
   void _onBottomBarItemTapped(int index) {
@@ -44,7 +57,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
     switch (index) {
       case 0:
-        // Đã ở Home, không cần làm gì
+        // Already on Home, no action needed
         break;
       case 1:
         Navigator.push(
@@ -70,7 +83,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           context, 
           MaterialPageRoute(builder: (context) => const ProfilePage())
         ).then((_) {
-          // Reset selected index khi quay về
+          // Reset selected index when returning
           setState(() {
             _selectedBottomBarIndex = 0;
           });
@@ -89,14 +102,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       appBar: BasicAppbar(
         hideBack: true,
         leading: IconButton(
-          onPressed: () {
-            Navigator.push(
+          onPressed: () async {
+            await Navigator.push(
             context, 
-            MaterialPageRoute(builder: (context) => const SearchPage())
+            MaterialPageRoute(builder: (context) => const LanguageSettingsPage())
           );
+          // Refresh language after returning from settings
+          _loadLanguage();
           }, 
           icon: const Icon(
-            Icons.search
+            Icons.language
           )
         ),
         title: SvgPicture.asset(
@@ -208,13 +223,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildTabButton('News', 0, isDesktop: true),
+        _buildTabButton(LanguageService.getTextSync('News', _currentLanguage), 0, isDesktop: true),
         const SizedBox(width: 40),
-        _buildTabButton('Videos', 1, isDesktop: true),
+        _buildTabButton(LanguageService.getTextSync('Videos', _currentLanguage), 1, isDesktop: true),
         const SizedBox(width: 40),
-        _buildTabButton('Artists', 2, isDesktop: true),
+        _buildTabButton(LanguageService.getTextSync('Artists', _currentLanguage), 2, isDesktop: true),
         const SizedBox(width: 40),
-        _buildTabButton('Podcasts', 3, isDesktop: true),
+        _buildTabButton(LanguageService.getTextSync('Podcasts', _currentLanguage), 3, isDesktop: true),
       ],
     );
   }
@@ -223,10 +238,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _buildTabButton('News', 0, isTablet: isTablet),
-        _buildTabButton('Videos', 1, isTablet: isTablet),
-        _buildTabButton('Artists', 2, isTablet: isTablet),
-        _buildTabButton('Podcasts', 3, isTablet: isTablet),
+        _buildTabButton(LanguageService.getTextSync('News', _currentLanguage), 0, isTablet: isTablet),
+        _buildTabButton(LanguageService.getTextSync('Videos', _currentLanguage), 1, isTablet: isTablet),
+        _buildTabButton(LanguageService.getTextSync('Artists', _currentLanguage), 2, isTablet: isTablet),
+        _buildTabButton(LanguageService.getTextSync('Podcasts', _currentLanguage), 3, isTablet: isTablet),
       ],
     );
   }

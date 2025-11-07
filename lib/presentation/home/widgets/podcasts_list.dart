@@ -1,4 +1,5 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:flutter/material.dart';
 
 class PodcastsList extends StatelessWidget {
@@ -86,7 +87,13 @@ class PodcastsList extends StatelessWidget {
       onTap: () {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Opening: ${podcast['title']}'),
+            content: FutureBuilder<String>(
+              future: LanguageService.getCurrentLanguage(),
+              builder: (context, snapshot) {
+                final currentLang = snapshot.data ?? 'vi';
+                return Text('${LanguageService.getTextSync('Opening', currentLang)}: ${podcast['title']}');
+              },
+            ),
             duration: const Duration(seconds: 1),
           ),
         );

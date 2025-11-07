@@ -2,6 +2,7 @@ import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/common/widgets/favorite_button/favorite_button.dart';
 import 'package:app_nghenhac/core/constants/app_urls.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/presentation/profile/bloc/favorite_songs_cubit.dart';
 import 'package:app_nghenhac/presentation/profile/bloc/favorite_songs_state.dart';
 import 'package:app_nghenhac/presentation/profile/bloc/profile_info_cubit.dart';
@@ -10,8 +11,28 @@ import 'package:app_nghenhac/presentation/song_player/pages/song_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLanguage();
+  }
+
+  void _loadLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    setState(() {
+      currentLanguage = language;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +40,7 @@ class ProfilePage extends StatelessWidget {
       appBar: BasicAppbar(
         backgroundColor: context.isDarkMode ? Color(0xff2C2B2B) : Colors.white,
         title: Text(
-          'Profile'
+          LanguageService.getTextSync('Profile', currentLanguage)
         ),
       ),
       body: Column(
@@ -87,7 +108,7 @@ class ProfilePage extends StatelessWidget {
 
           if(state is ProfileInfoFailure) {
             return Text(
-              'Please try again'
+              LanguageService.getTextSync('Try Again', currentLanguage)
             );
           }
 
@@ -108,8 +129,12 @@ class ProfilePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'FAVORITE SONGS',
+              Text(
+                LanguageService.getTextSync('Favorite Songs', currentLanguage),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               SizedBox(height: 20,),
           
@@ -195,7 +220,9 @@ class ProfilePage extends StatelessWidget {
                       );
                     }
                     if (state is FavoriteSongsFailure) {
-                      return Text('Please try again.');
+                      return Text(
+                        LanguageService.getTextSync('Try Again', currentLanguage)
+                      );
                     }
                   return Container();
                   }

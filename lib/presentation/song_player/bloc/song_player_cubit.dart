@@ -81,7 +81,7 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
     final newPosition = songPosition + const Duration(seconds: 5);
     final maxPosition = songDuration;
     
-    // Đảm bảo không vượt quá thời lượng bài hát
+    // Ensure not exceeding song duration
     if (newPosition <= maxPosition) {
       audioPlayer.seek(newPosition);
     } else {

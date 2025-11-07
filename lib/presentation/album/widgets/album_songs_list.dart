@@ -1,12 +1,13 @@
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/domain/entities/search/album.dart';
 import 'package:app_nghenhac/domain/entities/search/song.dart';
 import 'package:app_nghenhac/presentation/album/bloc/album_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AlbumSongsList extends StatelessWidget {
+class AlbumSongsList extends StatefulWidget {
   final List<SongEntity> songs;
   final AlbumEntity album;
   final int currentSongIndex;
@@ -25,21 +26,41 @@ class AlbumSongsList extends StatelessWidget {
   });
 
   @override
+  State<AlbumSongsList> createState() => _AlbumSongsListState();
+}
+
+class _AlbumSongsListState extends State<AlbumSongsList> {
+  String currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentLanguage();
+  }
+
+  Future<void> _loadCurrentLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    setState(() {
+      currentLanguage = language;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (songs.isEmpty) {
+    if (widget.songs.isEmpty) {
       return _buildEmptyState(context);
     }
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 32 : (isTablet ? 24 : 16),
-        vertical: isDesktop ? 24 : (isTablet ? 20 : 16),
+        horizontal: widget.isDesktop ? 32 : (widget.isTablet ? 24 : 16),
+        vertical: widget.isDesktop ? 24 : (widget.isTablet ? 20 : 16),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSectionHeader(context),
-          SizedBox(height: isDesktop ? 20 : 16),
+          SizedBox(height: widget.isDesktop ? 20 : 16),
           _buildSongsList(context),
         ],
       ),
@@ -50,18 +71,18 @@ class AlbumSongsList extends StatelessWidget {
     return Row(
       children: [
         Text(
-          'Danh sách bài hát',
+          LanguageService.getTextSync('song_list', currentLanguage),
           style: TextStyle(
-            fontSize: isDesktop ? 24 : (isTablet ? 20 : 18),
+            fontSize: widget.isDesktop ? 24 : (widget.isTablet ? 20 : 18),
             fontWeight: FontWeight.bold,
             color: context.isDarkMode ? Colors.white : Colors.black,
           ),
         ),
         const Spacer(),
         Text(
-          '${songs.length} bài hát',
+          '${widget.songs.length} ${LanguageService.getTextSync("songs", currentLanguage)}',
           style: TextStyle(
-            fontSize: isDesktop ? 16 : (isTablet ? 14 : 12),
+            fontSize: widget.isDesktop ? 16 : (widget.isTablet ? 14 : 12),
             color: context.isDarkMode ? Colors.white70 : Colors.black54,
           ),
         ),
@@ -73,15 +94,15 @@ class AlbumSongsList extends StatelessWidget {
     return ListView.separated(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: songs.length,
+      itemCount: widget.songs.length,
       separatorBuilder: (context, index) => Divider(
         height: 1,
         color: (context.isDarkMode ? Colors.white : Colors.black).withOpacity(0.1),
       ),
       itemBuilder: (context, index) {
-        final song = songs[index];
-        final isCurrentSong = index == currentSongIndex;
-        final isCurrentlyPlaying = isCurrentSong && isPlaying;
+        final song = widget.songs[index];
+        final isCurrentSong = index == widget.currentSongIndex;
+        final isCurrentlyPlaying = isCurrentSong && widget.isPlaying;
 
         return _buildSongItem(
           context,
@@ -107,8 +128,8 @@ class AlbumSongsList extends StatelessWidget {
       },
       child: Container(
         padding: EdgeInsets.symmetric(
-          vertical: isDesktop ? 16 : (isTablet ? 14 : 12),
-          horizontal: isDesktop ? 16 : (isTablet ? 12 : 8),
+          vertical: widget.isDesktop ? 16 : (widget.isTablet ? 14 : 12),
+          horizontal: widget.isDesktop ? 16 : (widget.isTablet ? 12 : 8),
         ),
         decoration: BoxDecoration(
           color: isCurrentSong
@@ -120,23 +141,23 @@ class AlbumSongsList extends StatelessWidget {
           children: [
             // Track Number or Play Icon
             SizedBox(
-              width: isDesktop ? 40 : (isTablet ? 36 : 32),
+              width: widget.isDesktop ? 40 : (widget.isTablet ? 36 : 32),
               child: isCurrentlyPlaying
                   ? Icon(
                       Icons.graphic_eq_rounded,
                       color: AppColors.primary,
-                      size: isDesktop ? 24 : (isTablet ? 22 : 20),
+                      size: widget.isDesktop ? 24 : (widget.isTablet ? 22 : 20),
                     )
                   : isCurrentSong
                       ? Icon(
                           Icons.pause_circle_rounded,
                           color: AppColors.primary,
-                          size: isDesktop ? 24 : (isTablet ? 22 : 20),
+                          size: widget.isDesktop ? 24 : (widget.isTablet ? 22 : 20),
                         )
                       : Text(
                           '${index + 1}',
                           style: TextStyle(
-                            fontSize: isDesktop ? 16 : (isTablet ? 14 : 12),
+                            fontSize: widget.isDesktop ? 16 : (widget.isTablet ? 14 : 12),
                             color: context.isDarkMode ? Colors.white70 : Colors.black54,
                             fontWeight: FontWeight.w500,
                           ),
@@ -144,13 +165,13 @@ class AlbumSongsList extends StatelessWidget {
                         ),
             ),
             
-            SizedBox(width: isDesktop ? 16 : (isTablet ? 12 : 8)),
+            SizedBox(width: widget.isDesktop ? 16 : (widget.isTablet ? 12 : 8)),
             
             // Song Cover (only on desktop/tablet)
-            if (isDesktop || isTablet) ...[
+            if (widget.isDesktop || widget.isTablet) ...[
               Container(
-                width: isDesktop ? 48 : 40,
-                height: isDesktop ? 48 : 40,
+                width: widget.isDesktop ? 48 : 40,
+                height: widget.isDesktop ? 48 : 40,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(4),
                   color: AppColors.primary.withOpacity(0.2),
@@ -165,7 +186,7 @@ class AlbumSongsList extends StatelessWidget {
                             return Icon(
                               Icons.music_note_rounded,
                               color: AppColors.primary,
-                              size: isDesktop ? 24 : 20,
+                              size: widget.isDesktop ? 24 : 20,
                             );
                           },
                         ),
@@ -173,10 +194,10 @@ class AlbumSongsList extends StatelessWidget {
                     : Icon(
                         Icons.music_note_rounded,
                         color: AppColors.primary,
-                        size: isDesktop ? 24 : 20,
+                        size: widget.isDesktop ? 24 : 20,
                       ),
               ),
-              SizedBox(width: isDesktop ? 16 : 12),
+              SizedBox(width: widget.isDesktop ? 16 : 12),
             ],
             
             // Song Info
@@ -187,7 +208,7 @@ class AlbumSongsList extends StatelessWidget {
                   Text(
                     song.title,
                     style: TextStyle(
-                      fontSize: isDesktop ? 16 : (isTablet ? 15 : 14),
+                      fontSize: widget.isDesktop ? 16 : (widget.isTablet ? 15 : 14),
                       fontWeight: isCurrentSong ? FontWeight.w600 : FontWeight.w500,
                       color: isCurrentSong
                           ? AppColors.primary
@@ -196,12 +217,12 @@ class AlbumSongsList extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  if (song.artist != album.artist) ...[
+                  if (song.artist != widget.album.artist) ...[
                     const SizedBox(height: 2),
                     Text(
                       song.artist,
                       style: TextStyle(
-                        fontSize: isDesktop ? 14 : (isTablet ? 13 : 12),
+                        fontSize: widget.isDesktop ? 14 : (widget.isTablet ? 13 : 12),
                         color: context.isDarkMode ? Colors.white70 : Colors.black54,
                       ),
                       maxLines: 1,
@@ -217,11 +238,11 @@ class AlbumSongsList extends StatelessWidget {
               Text(
                 _formatDuration(song.duration!),
                 style: TextStyle(
-                  fontSize: isDesktop ? 14 : (isTablet ? 13 : 12),
+                  fontSize: widget.isDesktop ? 14 : (widget.isTablet ? 13 : 12),
                   color: context.isDarkMode ? Colors.white70 : Colors.black54,
                 ),
               ),
-              SizedBox(width: isDesktop ? 16 : (isTablet ? 12 : 8)),
+              SizedBox(width: widget.isDesktop ? 16 : (widget.isTablet ? 12 : 8)),
             ],
             
             // More Options Button
@@ -231,7 +252,7 @@ class AlbumSongsList extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 child: Icon(
                   Icons.more_horiz_rounded,
-                  size: isDesktop ? 20 : (isTablet ? 18 : 16),
+                  size: widget.isDesktop ? 20 : (widget.isTablet ? 18 : 16),
                   color: context.isDarkMode ? Colors.white70 : Colors.black54,
                 ),
               ),
@@ -244,40 +265,40 @@ class AlbumSongsList extends StatelessWidget {
 
   Widget _buildEmptyState(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(isDesktop ? 48 : 32),
+      padding: EdgeInsets.all(widget.isDesktop ? 48 : 32),
       child: Center(
         child: Column(
           children: [
             Icon(
               Icons.music_off_rounded,
-              size: isDesktop ? 80 : 60,
+              size: widget.isDesktop ? 80 : 60,
               color: context.isDarkMode ? Colors.white38 : Colors.black38,
             ),
-            SizedBox(height: isDesktop ? 24 : 16),
+            SizedBox(height: widget.isDesktop ? 24 : 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   Icons.queue_music_rounded,
-                  size: isDesktop ? 24 : 20,
+                  size: widget.isDesktop ? 24 : 20,
                   color: context.isDarkMode ? Colors.white60 : Colors.black45,
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Không có bài hát nào',
+                  LanguageService.getTextSync('Không có bài hát nào', currentLanguage),
                   style: TextStyle(
-                    fontSize: isDesktop ? 20 : 16,
+                    fontSize: widget.isDesktop ? 20 : 16,
                     fontWeight: FontWeight.w500,
                     color: context.isDarkMode ? Colors.white70 : Colors.black54,
                   ),
                 ),
               ],
             ),
-            SizedBox(height: isDesktop ? 12 : 8),
+            SizedBox(height: widget.isDesktop ? 12 : 8),
             Text(
-              'Album này hiện chưa có bài hát nào.',
+              LanguageService.getTextSync('no songs in album', currentLanguage),
               style: TextStyle(
-                fontSize: isDesktop ? 16 : 14,
+                fontSize: widget.isDesktop ? 16 : 14,
                 color: context.isDarkMode ? Colors.white60 : Colors.black45,
               ),
               textAlign: TextAlign.center,
@@ -390,7 +411,9 @@ class AlbumSongsList extends StatelessWidget {
                     : (context.isDarkMode ? Colors.white : Colors.black87),
               ),
               title: Text(
-                song.isFavorite ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích',
+                song.isFavorite 
+                  ? LanguageService.getTextSync('Xóa khỏi yêu thích', currentLanguage)
+                  : LanguageService.getTextSync('Thêm vào yêu thích', currentLanguage),
                 style: TextStyle(
                   color: context.isDarkMode ? Colors.white : Colors.black87,
                 ),
@@ -406,7 +429,7 @@ class AlbumSongsList extends StatelessWidget {
                 color: context.isDarkMode ? Colors.white : Colors.black87,
               ),
               title: Text(
-                'Thêm vào playlist',
+                LanguageService.getTextSync('Thêm vào playlist', currentLanguage),
                 style: TextStyle(
                   color: context.isDarkMode ? Colors.white : Colors.black87,
                 ),
@@ -438,7 +461,7 @@ class AlbumSongsList extends StatelessWidget {
                 color: context.isDarkMode ? Colors.white : Colors.black87,
               ),
               title: Text(
-                'Tải xuống',
+                LanguageService.getTextSync('Tải về', currentLanguage),
                 style: TextStyle(
                   color: context.isDarkMode ? Colors.white : Colors.black87,
                 ),
