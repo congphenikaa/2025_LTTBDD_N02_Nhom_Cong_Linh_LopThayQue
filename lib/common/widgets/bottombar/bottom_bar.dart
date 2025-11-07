@@ -1,4 +1,5 @@
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:flutter/material.dart';
 
@@ -19,6 +20,41 @@ class AnimatedBottomBar extends StatefulWidget {
 }
 
 class _AnimatedBottomBarState extends State<AnimatedBottomBar> {
+  String _currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLanguage();
+    
+    // Lắng nghe thay đổi ngôn ngữ từ LanguageService
+    LanguageService.languageNotifier.addListener(_onLanguageChanged);
+  }
+
+  @override
+  void dispose() {
+    // Hủy listener khi dispose
+    LanguageService.languageNotifier.removeListener(_onLanguageChanged);
+    super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {
+        _currentLanguage = LanguageService.languageNotifier.value;
+      });
+    }
+  }
+
+  Future<void> _loadLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    if (mounted) {
+      setState(() {
+        _currentLanguage = language;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -34,10 +70,10 @@ class _AnimatedBottomBarState extends State<AnimatedBottomBar> {
       ),
       child: Row(
         children: [
-          _buildAnimatedItem('Home', Icons.home, 0),
-          _buildAnimatedItem('Search', Icons.search, 1),
-          _buildAnimatedItem('About', Icons.info_outline, 2),
-          _buildAnimatedItem('Profile', Icons.person, 3),
+          _buildAnimatedItem(LanguageService.getTextSync('Home', _currentLanguage), Icons.home, 0),
+          _buildAnimatedItem(LanguageService.getTextSync('Search', _currentLanguage), Icons.search, 1),
+          _buildAnimatedItem(LanguageService.getTextSync('Library', _currentLanguage), Icons.info_outline, 2),
+          _buildAnimatedItem(LanguageService.getTextSync('Profile', _currentLanguage), Icons.person, 3),
         ],
       ),
     );

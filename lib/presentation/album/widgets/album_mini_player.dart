@@ -32,6 +32,24 @@ class _AlbumMiniPlayerState extends State<AlbumMiniPlayer> {
   void initState() {
     super.initState();
     _loadCurrentLanguage();
+    
+    // Lắng nghe thay đổi ngôn ngữ từ LanguageService
+    LanguageService.languageNotifier.addListener(_onLanguageChanged);
+  }
+
+  @override
+  void dispose() {
+    // Hủy listener khi dispose
+    LanguageService.languageNotifier.removeListener(_onLanguageChanged);
+    super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {
+        currentLanguage = LanguageService.languageNotifier.value;
+      });
+    }
   }
 
   Future<void> _loadCurrentLanguage() async {

@@ -22,8 +22,48 @@ class ArtistsList extends StatelessWidget {
   }
 }
 
-class _ArtistsContent extends StatelessWidget {
+class _ArtistsContent extends StatefulWidget {
   const _ArtistsContent();
+
+  @override
+  State<_ArtistsContent> createState() => _ArtistsContentState();
+}
+
+class _ArtistsContentState extends State<_ArtistsContent> {
+  String _currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLanguage();
+    
+    // Lắng nghe thay đổi ngôn ngữ từ LanguageService
+    LanguageService.languageNotifier.addListener(_onLanguageChanged);
+  }
+
+  @override
+  void dispose() {
+    // Hủy listener khi dispose
+    LanguageService.languageNotifier.removeListener(_onLanguageChanged);
+    super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {
+        _currentLanguage = LanguageService.languageNotifier.value;
+      });
+    }
+  }
+
+  Future<void> _loadLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    if (mounted) {
+      setState(() {
+        _currentLanguage = language;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +116,7 @@ class _ArtistsContent extends StatelessWidget {
                         onPressed: () {
                           context.read<ArtistsCubit>().getArtists(limit: 20);
                         },
-                        child: const Text('Thử lại'),
+                        child: Text(LanguageService.getTextSync('Try Again', _currentLanguage)),
                       ),
                     ],
                   ),
@@ -183,20 +223,14 @@ class _ArtistsContent extends StatelessWidget {
             ),
             SizedBox(height: isDesktop ? 6 : 4),
             if (artist.followers != null)
-              FutureBuilder<String>(
-                future: LanguageService.getCurrentLanguage(),
-                builder: (context, snapshot) {
-                  final currentLang = snapshot.data ?? 'vi';
-                  return Text(
-                    '${_formatFollowers(artist.followers!)} ${LanguageService.getTextSync('Followers', currentLang)}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                      fontSize: isDesktop ? 13 : (isTablet ? 12 : 12),
-                      color: context.isDarkMode ? Colors.grey[300] : Colors.grey[600],
-                    ),
-                    textAlign: TextAlign.center,
-                  );
-                },
+              Text(
+                '${_formatFollowers(artist.followers!)} ${LanguageService.getTextSync('Followers', _currentLanguage)}',
+                style: TextStyle(
+                  fontWeight: FontWeight.w400,
+                  fontSize: isDesktop ? 13 : (isTablet ? 12 : 12),
+                  color: context.isDarkMode ? Colors.grey[300] : Colors.grey[600],
+                ),
+                textAlign: TextAlign.center,
               ),
           ],
         ),

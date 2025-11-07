@@ -29,7 +29,25 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
   @override
   void initState() {
     super.initState();
+    
+    // Lắng nghe thay đổi ngôn ngữ từ LanguageService
+    LanguageService.languageNotifier.addListener(_onLanguageChanged);
     _loadCurrentLanguage();
+  }
+
+  @override
+  void dispose() {
+    // Hủy listener khi dispose
+    LanguageService.languageNotifier.removeListener(_onLanguageChanged);
+    super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {
+        currentLanguage = LanguageService.languageNotifier.value;
+      });
+    }
   }
 
   Future<void> _loadCurrentLanguage() async {

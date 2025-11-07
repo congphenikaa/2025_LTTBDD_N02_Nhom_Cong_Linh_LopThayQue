@@ -2,6 +2,7 @@ import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/common/widgets/bottombar/bottom_bar.dart';
 import 'package:app_nghenhac/common/widgets/drawer/app_drawer.dart';
+import 'package:app_nghenhac/common/widgets/language/language_builder.dart';
 import 'package:app_nghenhac/core/configs/assets/app_images.dart';
 import 'package:app_nghenhac/core/configs/assets/app_vectors.dart';
 import 'package:app_nghenhac/core/configs/theme/app_colors.dart';
@@ -39,6 +40,25 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
     _loadLanguage();
+    
+    // Lắng nghe thay đổi ngôn ngữ từ LanguageService
+    LanguageService.languageNotifier.addListener(_onLanguageChanged);
+  }
+
+  @override
+  void dispose() {
+    // Hủy listener khi dispose
+    LanguageService.languageNotifier.removeListener(_onLanguageChanged);
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {
+        _currentLanguage = LanguageService.languageNotifier.value;
+      });
+    }
   }
 
   Future<void> _loadLanguage() async {
@@ -102,13 +122,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       appBar: BasicAppbar(
         hideBack: true,
         leading: IconButton(
-          onPressed: () async {
-            await Navigator.push(
-            context, 
-            MaterialPageRoute(builder: (context) => const LanguageSettingsPage())
-          );
-          // Refresh language after returning from settings
-          _loadLanguage();
+          onPressed: () {
+            Navigator.push(
+              context, 
+              MaterialPageRoute(builder: (context) => const LanguageSettingsPage())
+            );
+            // Không cần gọi _loadLanguage() nữa vì đã có listener
           }, 
           icon: const Icon(
             Icons.language
@@ -151,7 +170,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             ),
             const PlayList(),
             const AlbumsList(),
-            const PlaylistsList(),
+            PlaylistsList(),
           ],
         ),
       ),

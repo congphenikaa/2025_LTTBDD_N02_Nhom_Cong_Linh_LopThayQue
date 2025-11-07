@@ -18,11 +18,44 @@ class _PlaylistsListState extends State<PlaylistsList> {
   List<PlaylistEntity> _playlists = [];
   bool _isLoading = true;
   String? _error;
+  String _currentLanguage = 'vi';
 
   @override
   void initState() {
     super.initState();
+    
+    print('🚀 PlaylistsList: initState called');
+    
+    // Lắng nghe thay đổi ngôn ngữ từ LanguageService trước
+    LanguageService.languageNotifier.addListener(_onLanguageChanged);
+    print('👂 PlaylistsList: Added language listener');
+    
+    // Khởi tạo ngôn ngữ hiện tại
+    _currentLanguage = LanguageService.languageNotifier.value;
+    print('🌍 PlaylistsList: Initial language set to: $_currentLanguage');
+    
     _loadPlaylists();
+  }
+
+  @override
+  void dispose() {
+    print('💀 PlaylistsList: dispose called');
+    // Hủy listener khi dispose
+    LanguageService.languageNotifier.removeListener(_onLanguageChanged);
+    print('🔇 PlaylistsList: Removed language listener');
+    super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    print('🔄 PlaylistsList: Language changed to ${LanguageService.languageNotifier.value}');
+    if (mounted) {
+      setState(() {
+        _currentLanguage = LanguageService.languageNotifier.value;
+        print('✅ PlaylistsList: setState completed with language: $_currentLanguage');
+      });
+    } else {
+      print('⚠️ PlaylistsList: Widget not mounted, skipping setState');
+    }
   }
 
   Future<void> _loadPlaylists() async {
@@ -96,26 +129,20 @@ class _PlaylistsListState extends State<PlaylistsList> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            FutureBuilder<String>(
-              future: LanguageService.getCurrentLanguage(),
-              builder: (context, snapshot) {
-                final currentLang = snapshot.data ?? 'vi';
-                return Text(
-                  LanguageService.getTextSync('Featured Playlists', currentLang),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: isDesktop ? 24 : (isTablet ? 20 : 18),
-                    color: context.isDarkMode ? Colors.white : Colors.black,
-                  ),
-                );
-              },
+            Text(
+              LanguageService.getTextSync('Featured Playlists', _currentLanguage),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: isDesktop ? 24 : (isTablet ? 20 : 18),
+                color: context.isDarkMode ? Colors.white : Colors.black,
+              ),
             ),
             TextButton(
               onPressed: () {
                 // Navigate to all playlists page
               },
               child: Text(
-                'Xem tất cả',
+                LanguageService.getTextSync('See More', _currentLanguage),
                 style: TextStyle(
                   fontSize: isDesktop ? 16 : (isTablet ? 14 : 12),
                   color: context.isDarkMode ? Colors.white70 : AppColors.primary,
@@ -155,7 +182,7 @@ class _PlaylistsListState extends State<PlaylistsList> {
               ),
               SizedBox(height: 8),
               Text(
-                'Không thể tải playlists',
+                LanguageService.getTextSync('Cannot load playlists', _currentLanguage),
                 style: TextStyle(
                   fontSize: isDesktop ? 16 : 14,
                   color: context.isDarkMode ? Colors.white70 : Colors.black54,
@@ -164,7 +191,7 @@ class _PlaylistsListState extends State<PlaylistsList> {
               SizedBox(height: 8),
               TextButton(
                 onPressed: _loadPlaylists,
-                child: Text('Thử lại'),
+                child: Text(LanguageService.getTextSync('Try Again', _currentLanguage)),
               ),
             ],
           ),
@@ -177,7 +204,7 @@ class _PlaylistsListState extends State<PlaylistsList> {
         height: isDesktop ? 260 : (isTablet ? 220 : 180),
         child: Center(
           child: Text(
-            'Không có playlists nào',
+            LanguageService.getTextSync('No Playlists Found', _currentLanguage),
             style: TextStyle(
               fontSize: isDesktop ? 16 : 14,
               color: context.isDarkMode ? Colors.white70 : Colors.black54,
@@ -310,7 +337,7 @@ class _PlaylistsListState extends State<PlaylistsList> {
                       if (playlist.creatorName != null) ...[
                         Expanded(
                           child: Text(
-                            'Bởi ${playlist.creatorName}',
+                            '${LanguageService.getTextSync('By', _currentLanguage)} ${playlist.creatorName}',
                             style: TextStyle(
                               fontSize: isDesktop ? 12 : (isTablet ? 11 : 10),
                               color: Colors.white70,

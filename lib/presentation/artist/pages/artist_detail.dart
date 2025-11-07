@@ -29,7 +29,25 @@ class _ArtistDetailPageState extends State<ArtistDetailPage> {
   @override
   void initState() {
     super.initState();
+    
+    // Lắng nghe thay đổi ngôn ngữ từ LanguageService
+    LanguageService.languageNotifier.addListener(_onLanguageChanged);
     _loadLanguage();
+  }
+
+  @override
+  void dispose() {
+    // Hủy listener khi dispose
+    LanguageService.languageNotifier.removeListener(_onLanguageChanged);
+    super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {
+        currentLanguage = LanguageService.languageNotifier.value;
+      });
+    }
   }
 
   void _loadLanguage() async {

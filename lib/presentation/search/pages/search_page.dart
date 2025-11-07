@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/common/helpers/is_dark_mode.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/service_locator.dart';
 import '../bloc/search_cubit.dart';
 import '../bloc/search_state.dart';
@@ -25,10 +26,15 @@ class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   late SearchCubit _searchCubit;
+  String _currentLanguage = 'vi';
 
   @override
   void initState() {
     super.initState();
+    _loadLanguage();
+    
+    // Lắng nghe thay đổi ngôn ngữ từ LanguageService
+    LanguageService.languageNotifier.addListener(_onLanguageChanged);
     _searchCubit = sl<SearchCubit>();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _searchFocusNode.requestFocus();
@@ -40,10 +46,29 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   void dispose() {
+    // Hủy listener khi dispose
+    LanguageService.languageNotifier.removeListener(_onLanguageChanged);
     _searchController.dispose();
     _searchFocusNode.dispose();
     _searchCubit.close();
     super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {
+        _currentLanguage = LanguageService.languageNotifier.value;
+      });
+    }
+  }
+
+  Future<void> _loadLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    if (mounted) {
+      setState(() {
+        _currentLanguage = language;
+      });
+    }
   }
 
   @override
@@ -54,7 +79,7 @@ class _SearchPageState extends State<SearchPage> {
       value: _searchCubit,
       child: Scaffold(
         appBar: BasicAppbar(
-          title: const Text('Search'),
+          title: Text(LanguageService.getTextSync('Search', _currentLanguage)),
         ),
         body: SafeArea(
           child: Column(
@@ -290,7 +315,7 @@ class _SearchPageState extends State<SearchPage> {
                       onPressed: () {
                          _searchCubit.clearSearchHistory();
                       },
-                      child: const Text('Clear all'),
+                      child: Text(LanguageService.getTextSync('Clear All', _currentLanguage)),
                     ),
                   ],
                 ),
@@ -572,7 +597,7 @@ class _SearchPageState extends State<SearchPage> {
                 _searchCubit.search(_searchController.text); // ✅ Dùng _searchCubit
               }
             },
-            child: const Text('Try again'),
+            child: Text(LanguageService.getTextSync('Try Again', _currentLanguage)),
           ),
         ],
       ),

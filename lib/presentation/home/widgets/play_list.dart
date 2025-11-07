@@ -9,8 +9,48 @@ import 'package:app_nghenhac/presentation/song_player/pages/song_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class PlayList extends StatelessWidget {
+class PlayList extends StatefulWidget {
   const PlayList({super.key});
+
+  @override
+  State<PlayList> createState() => _PlayListState();
+}
+
+class _PlayListState extends State<PlayList> {
+  String _currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLanguage();
+    
+    // Lắng nghe thay đổi ngôn ngữ từ LanguageService
+    LanguageService.languageNotifier.addListener(_onLanguageChanged);
+  }
+
+  @override
+  void dispose() {
+    // Hủy listener khi dispose
+    LanguageService.languageNotifier.removeListener(_onLanguageChanged);
+    super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {
+        _currentLanguage = LanguageService.languageNotifier.value;
+      });
+    }
+  }
+
+  Future<void> _loadLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    if (mounted) {
+      setState(() {
+        _currentLanguage = language;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,33 +75,21 @@ class PlayList extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      FutureBuilder<String>(
-                        future: LanguageService.getCurrentLanguage(),
-                        builder: (context, snapshot) {
-                          final currentLang = snapshot.data ?? 'vi';
-                          return Text(
-                            LanguageService.getTextSync('Playlists', currentLang),
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16
-                            ),
-                          );
-                        },
+                      Text(
+                        LanguageService.getTextSync('Playlists', _currentLanguage),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16
+                        ),
                       ),
               
-                      FutureBuilder<String>(
-                        future: LanguageService.getCurrentLanguage(),
-                        builder: (context, snapshot) {
-                          final currentLang = snapshot.data ?? 'vi';
-                          return Text(
-                            LanguageService.getTextSync('See More', currentLang),
-                            style: TextStyle(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 10,
-                              color: const Color(0xffC6C6C6)
-                            ),
-                          );
-                        },
+                      Text(
+                        LanguageService.getTextSync('See More', _currentLanguage),
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 10,
+                          color: const Color(0xffC6C6C6)
+                        ),
                       ),
                     ],
                   ),

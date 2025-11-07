@@ -32,6 +32,25 @@ class _AllAlbumsPageState extends State<AllAlbumsPage> {
     _loadCurrentLanguage();
     _loadAlbums();
     _scrollController.addListener(_onScroll);
+    
+    // Lắng nghe thay đổi ngôn ngữ từ LanguageService
+    LanguageService.languageNotifier.addListener(_onLanguageChanged);
+  }
+
+  @override
+  void dispose() {
+    // Hủy listener khi dispose
+    LanguageService.languageNotifier.removeListener(_onLanguageChanged);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {
+        currentLanguage = LanguageService.languageNotifier.value;
+      });
+    }
   }
 
   Future<void> _loadCurrentLanguage() async {
@@ -39,12 +58,6 @@ class _AllAlbumsPageState extends State<AllAlbumsPage> {
     setState(() {
       currentLanguage = language;
     });
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
   }
 
   void _onScroll() {

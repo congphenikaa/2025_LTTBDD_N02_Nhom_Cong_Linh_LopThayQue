@@ -19,6 +19,24 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
   void initState() {
     super.initState();
     _loadSelectedLanguage();
+    
+    // Lắng nghe thay đổi ngôn ngữ từ LanguageService
+    LanguageService.languageNotifier.addListener(_onLanguageChanged);
+  }
+
+  @override
+  void dispose() {
+    // Hủy listener khi dispose
+    LanguageService.languageNotifier.removeListener(_onLanguageChanged);
+    super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {
+        _selectedLanguage = LanguageService.languageNotifier.value;
+      });
+    }
   }
 
   Future<void> _loadSelectedLanguage() async {
@@ -33,11 +51,7 @@ class _LanguageSettingsPageState extends State<LanguageSettingsPage> {
 
   Future<void> _saveLanguagePreference(String languageCode) async {
     await LanguageService.saveLanguage(languageCode);
-    if (mounted) {
-      setState(() {
-        _selectedLanguage = languageCode;
-      });
-    }
+    // Không cần setState vì listener sẽ tự động cập nhật
     
     // Show confirmation
     _showSnackBar(

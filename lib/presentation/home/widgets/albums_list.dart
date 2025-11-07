@@ -28,11 +28,24 @@ class _AlbumsListState extends State<AlbumsList> {
     super.initState();
     _loadLanguage();
     _loadAlbums();
+    
+    // Lắng nghe thay đổi ngôn ngữ từ LanguageService
+    LanguageService.languageNotifier.addListener(_onLanguageChanged);
   }
 
   @override
   void dispose() {
+    // Hủy listener khi dispose
+    LanguageService.languageNotifier.removeListener(_onLanguageChanged);
     super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {
+        _currentLanguage = LanguageService.languageNotifier.value;
+      });
+    }
   }
 
   Future<void> _loadLanguage() async {

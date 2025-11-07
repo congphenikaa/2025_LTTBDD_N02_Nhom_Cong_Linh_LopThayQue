@@ -3,6 +3,7 @@ import 'package:app_nghenhac/common/widgets/appbar/app_bar.dart';
 import 'package:app_nghenhac/common/widgets/drawer/app_drawer.dart';
 import 'package:app_nghenhac/common/widgets/favorite_button/favorite_button.dart';
 import 'package:app_nghenhac/core/constants/app_urls.dart';
+import 'package:app_nghenhac/core/services/language_service.dart';
 import 'package:app_nghenhac/domain/entities/song/song.dart';
 import 'package:app_nghenhac/presentation/song_player/bloc/song_player_cubit.dart';
 import 'package:app_nghenhac/presentation/song_player/bloc/song_player_state.dart';
@@ -10,7 +11,7 @@ import 'package:app_nghenhac/service_locator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class SongPlayerPages extends StatelessWidget {
+class SongPlayerPages extends StatefulWidget {
   final SongEntity songEntity;
   const SongPlayerPages({
     super.key,
@@ -18,11 +19,51 @@ class SongPlayerPages extends StatelessWidget {
     });
 
   @override
+  State<SongPlayerPages> createState() => _SongPlayerPagesState();
+}
+
+class _SongPlayerPagesState extends State<SongPlayerPages> {
+  String _currentLanguage = 'vi';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLanguage();
+    
+    // Lắng nghe thay đổi ngôn ngữ từ LanguageService
+    LanguageService.languageNotifier.addListener(_onLanguageChanged);
+  }
+
+  @override
+  void dispose() {
+    // Hủy listener khi dispose
+    LanguageService.languageNotifier.removeListener(_onLanguageChanged);
+    super.dispose();
+  }
+
+  void _onLanguageChanged() {
+    if (mounted) {
+      setState(() {
+        _currentLanguage = LanguageService.languageNotifier.value;
+      });
+    }
+  }
+
+  Future<void> _loadLanguage() async {
+    final language = await LanguageService.getCurrentLanguage();
+    if (mounted) {
+      setState(() {
+        _currentLanguage = language;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: BasicAppbar(
-        title: const Text(
-          'Now playing',
+        title: Text(
+          LanguageService.getTextSync('now_playing', _currentLanguage),
           style: TextStyle(
             fontSize: 18
           ),
@@ -41,7 +82,7 @@ class SongPlayerPages extends StatelessWidget {
       endDrawer: const AppDrawer(),
       body: BlocProvider(
         create: (_) => sl<SongPlayerCubit>()..loadSong(
-          '${AppURLs.songFirestorage}${songEntity.artist} - ${songEntity.title}.mp3?${AppURLs.mediaAlt}'
+          '${AppURLs.songFirestorage}${widget.songEntity.artist} - ${widget.songEntity.title}.mp3?${AppURLs.mediaAlt}'
         ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(
@@ -70,7 +111,7 @@ class SongPlayerPages extends StatelessWidget {
         image: DecorationImage(
           fit: BoxFit.cover,
           image: NetworkImage(
-            '${AppURLs.coverFirestorage}${songEntity.artist} - ${songEntity.title}.jpg?${AppURLs.mediaAlt}'
+            '${AppURLs.coverFirestorage}${widget.songEntity.artist} - ${widget.songEntity.title}.jpg?${AppURLs.mediaAlt}'
           )
         )
       ),
@@ -85,7 +126,7 @@ class SongPlayerPages extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              songEntity.title,
+              widget.songEntity.title,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 22,
@@ -93,7 +134,7 @@ class SongPlayerPages extends StatelessWidget {
             ),
             const SizedBox(height: 5,),
             Text(
-              songEntity.artist,
+              widget.songEntity.artist,
               style: const TextStyle(
               fontWeight: FontWeight.w400,
               fontSize: 14
@@ -102,7 +143,7 @@ class SongPlayerPages extends StatelessWidget {
           ],
         ),
         FavoriteButton(
-          songEntity: songEntity,
+          songEntity: widget.songEntity,
         )
       ],
     );

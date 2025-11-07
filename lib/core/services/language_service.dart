@@ -1,18 +1,32 @@
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LanguageService {
   static const String _languageKey = 'selected_language';
   
+  // Global notifier để thông báo thay đổi ngôn ngữ
+  static final ValueNotifier<String> _languageNotifier = ValueNotifier<String>('vi');
+  
+  // Getter để lấy notifier
+  static ValueNotifier<String> get languageNotifier => _languageNotifier;
+  
   // Get current language setting
   static Future<String> getCurrentLanguage() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_languageKey) ?? 'vi'; // Default to Vietnamese
+    final language = prefs.getString(_languageKey) ?? 'vi'; // Default to Vietnamese
+    
+    // Đồng bộ notifier với SharedPreferences
+    _languageNotifier.value = language;
+    return language;
   }
   
   // Save language setting
   static Future<void> saveLanguage(String languageCode) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_languageKey, languageCode);
+    
+    // Thông báo thay đổi ngôn ngữ cho tất cả listeners
+    _languageNotifier.value = languageCode;
   }
   
   // Get text based on current language
@@ -521,6 +535,26 @@ class LanguageService {
       'vi': 'Lỗi đăng nhập Google',
       'en': 'Google login error',
     },
+    'Login successful': {
+      'vi': 'Đăng nhập thành công',
+      'en': 'Login successful',
+    },
+    'Login error': {
+      'vi': 'Lỗi đăng nhập',
+      'en': 'Login error',
+    },
+    'Signed out successfully': {
+      'vi': 'Đã đăng xuất',
+      'en': 'Signed out successfully',
+    },
+    'Sign out error': {
+      'vi': 'Lỗi đăng xuất',
+      'en': 'Sign out error',
+    },
+    'Clear All': {
+      'vi': 'Xóa tất cả',
+      'en': 'Clear All',
+    },
     'Music description': {
       'vi': 'Giải phóng âm thanh của bạn, khám phá nhịp điệu và để âm nhạc đưa bạn đến những nơi mới, bởi vì mỗi khoảnh khắc đều có một bản nhạc đang chờ được tìm thấy.',
       'en': 'Unleash your sound, discover your rhythm, and let the music take you to new places, because every moment has a soundtrack waiting to be found.',
@@ -562,6 +596,14 @@ class LanguageService {
     'No Playlists Found': {
       'vi': 'Không có playlists nào',
       'en': 'No Playlists Found',
+    },
+    'Cannot load playlists': {
+      'vi': 'Không thể tải playlists',
+      'en': 'Cannot load playlists',
+    },
+    'By': {
+      'vi': 'Bởi',
+      'en': 'By',
     },
     'See More': {
       'vi': 'Xem thêm',
