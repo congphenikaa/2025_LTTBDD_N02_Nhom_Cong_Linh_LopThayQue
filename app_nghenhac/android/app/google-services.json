@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "875334233564",
+    "project_id": "spotify-c1e06",
+    "storage_bucket": "spotify-c1e06.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:875334233564:android:e29eb799facef7287d7319",
+        "android_client_info": {
+          "package_name": "com.example.app_nghenhac"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "875334233564-8ujd6dqoma9vjgm434svtal4pv7802qe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.app_nghenhac",
+            "certificate_hash": "e38e2b2147b3d3f7746a008cbba7cafa36936a3e"
+          }
+        },
+        {
+          "client_id": "875334233564-mj30gddb12rtrof5tq417u55t1q4p6qi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHbH3Mt3PVUi8USNIjkEHwEbzVJDvLDjc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "875334233564-mj30gddb12rtrof5tq417u55t1q4p6qi.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "875334233564-pac7vod3qkf4dcaij3gr5bcmg3rqj117.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.appNghenhac"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
