@@ -39,7 +39,8 @@ const registerUser = async (req, res) => {
             email,
             fullName: fullName || "User", // Lấy tên từ Flutter gửi lên
             googleId: uid, // Lưu UID Firebase để tham chiếu
-            avatar: decoded.picture || ""
+            avatar: decoded.picture || "",
+            role: "user"
         });
 
         await newUser.save();
@@ -74,8 +75,12 @@ const loginUser = async (req, res) => {
             return res.status(404).json({ success: false, message: "Không tìm thấy thông tin người dùng trong hệ thống" });
         }
 
-        console.log(`[LOGIN] User đăng nhập: ${decoded.email}`);
-        res.status(200).json({ success: true, message: "Đăng nhập thành công", token: user._id, data: user });
+        res.status(200).json({ 
+            success: true, 
+            message: "Đăng nhập thành công", 
+            token: user._id, 
+            data: user 
+        });
 
     } catch (error) {
         console.error(error);
@@ -99,7 +104,8 @@ const syncGoogleUser = async (req, res) => {
                 email: decoded.email,
                 fullName: decoded.name || "Google User",
                 avatar: decoded.picture || "",
-                googleId: decoded.uid
+                googleId: decoded.uid,
+                role: "user"
             });
             await user.save();
             console.log(`[GOOGLE] Tạo mới: ${decoded.email}`);

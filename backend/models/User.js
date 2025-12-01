@@ -20,6 +20,12 @@ const userSchema = new mongoose.Schema({
     googleId: {
         type: String, // ID riêng của Google (nếu có)
     },
+
+    role: {
+        type: String,
+        enum: ["user", "admin"], 
+        default: "user",         
+    },
     // Sau này có thể thêm favorites: [], playlist: []...
 }, { timestamps: true });
 
